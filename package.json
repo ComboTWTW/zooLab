@@ -4,14 +4,22 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^6.1.6",
+    "@mui/material": "^6.1.6",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-animated-burgers": "^1.2.8",
+    "react-awesome-reveal": "^4.2.14",
+    "react-dom": "^18.3.1",
+    "react-scrollama": "^2.3.3",
+    "swiper": "^11.1.14"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
