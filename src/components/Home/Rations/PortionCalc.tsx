@@ -1,5 +1,5 @@
-import { calc_curl } from "../../assets";
-import { rationCalc } from "../../constants";
+import { calc_curl } from "../../../assets";
+import { rationCalc } from "../../../constants";
 import { Fade } from "react-awesome-reveal";
 
 const PortionCalc = () => {

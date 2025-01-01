@@ -1,5 +1,5 @@
-import { howGet_arrow } from "../assets";
-import { howGet } from "../constants";
+import { howGet_arrow } from "../../assets";
+import { howGet } from "../../constants";
 import { Fade } from "react-awesome-reveal";
 
 const HowToGet = () => {

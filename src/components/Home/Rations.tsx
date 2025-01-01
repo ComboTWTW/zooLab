@@ -1,6 +1,6 @@
-import { rations_sm_curl } from "../assets";
-import { rations } from "../constants";
-import PortionCalc from "./design/PortionCalc";
+import { rations_sm_curl } from "../../assets";
+import { rations } from "../../constants";
+import PortionCalc from "./Rations/PortionCalc";
 import CardsMobile from "./Rations/CardsMobile";
 import { Fade } from "react-awesome-reveal";
 

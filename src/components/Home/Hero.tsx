@@ -1,4 +1,4 @@
-import Navbar from "./Navbar";
+import Navbar from "../Navbar/Navbar";
 import { heroText } from "../../constants";
 import { zooov_hero, sm_hero_ellipse } from "../../assets";
 import { Fade } from "react-awesome-reveal";

@@ -1,4 +1,4 @@
-import { rations } from "../../constants";
+import { rations } from "../../../constants";
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -9,7 +9,7 @@ import { Fade } from "react-awesome-reveal";
 import "swiper/css";
 import "swiper/css/pagination";
 
-import "../../index.css";
+import "../../../index.css";
 
 const CardsMobile = () => {
     return (
