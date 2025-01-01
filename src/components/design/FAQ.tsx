@@ -9,18 +9,17 @@ import { useState } from "react";
 import { Fade } from "react-awesome-reveal";
 
 const FAQ = () => {
-    const [indexOp, setIndexOp] = useState<number>(0);
-    const [opened, setOpened] = useState<boolean>(true);
+    const [openedArr, setOpenedArr] = useState<number[]>([0]);
 
     const handleClicked = (index: number) => {
-        setIndexOp(index);
-        console.log("previous index " + indexOp);
-        console.log("index clicked " + index);
-
-        !opened ? setOpened(() => true) : setOpened(false);
-        console.log(index + " is " + opened);
-
-        index !== indexOp && setOpened(true);
+        /* Adds index to array if there was no one and removes it there was*/
+        openedArr.includes(index)
+            ? setOpenedArr([
+                  ...openedArr.filter(
+                      (clickedNumber) => clickedNumber !== index
+                  ),
+              ])
+            : setOpenedArr([...openedArr, index]);
     };
 
     return (
@@ -48,28 +47,26 @@ const FAQ = () => {
                                 triggerOnce={true}
                             >
                                 <Accordion
-                                    expanded={index === indexOp && opened}
+                                    /* Opens item with this index if its index is inside openedArr */
+                                    expanded={openedArr.includes(index)}
                                     elevation={0}
                                     onChange={() => handleClicked(index)}
                                     disableGutters={true}
                                 >
                                     <AccordionSummary
                                         expandIcon={
-                                            !opened || index !== indexOp ? (
-                                                <AddIcon
+                                            openedArr.includes(index) ? (
+                                                <RemoveIcon
                                                     style={{
                                                         color: "#961914",
                                                     }}
                                                 />
                                             ) : (
-                                                index === indexOp &&
-                                                opened && (
-                                                    <RemoveIcon
-                                                        style={{
-                                                            color: "#961914",
-                                                        }}
-                                                    />
-                                                )
+                                                <AddIcon
+                                                    style={{
+                                                        color: "#961914",
+                                                    }}
+                                                />
                                             )
                                         }
                                         aria-controls={`panel${
