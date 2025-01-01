@@ -9,11 +9,7 @@ const Hero = () => {
             className={`relative w-full bg-hero-bg bg-cover bg-center flex flex-col items-center`}
         >
             <div className="max-w-[1200px] w-full z-20">
-                <div className="fixed w-full max-w-[1200px] top-0 z-[20]">
-                    <Navbar />
-                </div>
-
-                <div className=" flex flex-col items-start mt-[150px] mb-44 md:mb-56 px-5">
+                <div className=" flex flex-col items-start mt-[237px] mb-44 md:mb-56 px-5">
                     <div className="z-[2] flex flex-col max-w-[410px] gap-10">
                         <div className="relative">
                             <Fade

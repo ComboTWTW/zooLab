@@ -17,7 +17,7 @@ const Navbar = () => {
         <nav
             className={`  ${
                 toggleBurger ? "bg-white md:bg-transparent" : "bg-transparent"
-            }  h-[70px] md:h-[100px] duration-500  `}
+            }  h-[70px] md:h-[100px] duration-500  w-full max-w-[1200px] fixed z-30`}
             onScroll={() => {
                 setRectMoving(true);
             }}
