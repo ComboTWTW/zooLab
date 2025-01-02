@@ -20,6 +20,16 @@ function App() {
                         <div className="min-w-[100px] min-h-[100px] bg-transparent absolute top-32 z-20"></div>
                     </Step>
                 </Scrollama>
+
+                <Scrollama
+                    offset={0}
+                    onStepEnter={() => setScrollTriger(false)}
+                >
+                    <Step>
+                        <div className="min-w-[100px] min-h-[20px] bg-transparent  absolute top-0 z-20"></div>
+                    </Step>
+                </Scrollama>
+
                 <Routes>
                     <Route path={"/"} element={<Home />} />
 
