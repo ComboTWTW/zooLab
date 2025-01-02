@@ -19,6 +19,14 @@ const Navbar = ({ scrollTrigger }: Props) => {
         console.log(scrollTrigger);
     }, [scrollTrigger]);
 
+    useEffect(() => {
+        if (toggleBurger) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+    }, [toggleBurger]);
+
     return (
         <nav
             className={`  ${
@@ -92,43 +100,43 @@ const Navbar = ({ scrollTrigger }: Props) => {
                         />
                     </div>
                 </div>
+            </div>
 
-                {/* Navlinks Mobile */}
-                <div
-                    className={`md:hidden z-10 absolute right-0 left-0 ${
-                        toggleBurger ? "top-[70px]" : "top-[-755px]"
-                    } bg-white w-full flex flex-col items-center py-12 duration-500`}
-                >
-                    <ul className="flex flex-col items-center gap-12">
-                        {navLinks.map((link) => {
-                            return (
-                                <a
-                                    key={link.id}
-                                    href={link.linkTo}
-                                    className="montserrat text-black text-2xl font-medium"
-                                >
-                                    {link.tittle}
-                                </a>
-                            );
-                        })}
-                    </ul>
+            {/* Navlinks Mobile */}
+            <div
+                className={`md:hidden z-10 fixed inset-0 ${
+                    toggleBurger ? "top-[70px]" : "top-[-755px]"
+                } bg-white w-full flex flex-col items-center py-12 duration-500 overflow-y-auto h-[100vh]`}
+            >
+                <ul className="flex flex-col items-center gap-12">
+                    {navLinks.map((link) => {
+                        return (
+                            <a
+                                key={link.id}
+                                href={link.linkTo}
+                                className="montserrat text-black text-2xl font-medium"
+                            >
+                                {link.tittle}
+                            </a>
+                        );
+                    })}
+                </ul>
 
-                    <button className="z-10 min-w-12 bg-mainRed mt-24 px-12 py-3 rounded-lg montserrat font-semibold text-white">
-                        {heroText.btn}
-                    </button>
+                <button className="z-10 min-w-12 bg-mainRed mt-16 px-12 py-3 rounded-lg montserrat font-semibold text-white mb-20">
+                    {heroText.btn}
+                </button>
 
-                    <img
-                        src={sm_menu_curl_left}
-                        alt="Mobile Menu curl at left"
-                        className="absolute left-0 top-28"
-                    />
+                <img
+                    src={sm_menu_curl_left}
+                    alt="Mobile Menu curl at left"
+                    className="absolute left-0 top-28"
+                />
 
-                    <img
-                        src={sm_menu_curl_right}
-                        alt="Mobile Menu curl at right"
-                        className="absolute right-0 top-64"
-                    />
-                </div>
+                <img
+                    src={sm_menu_curl_right}
+                    alt="Mobile Menu curl at right"
+                    className="absolute right-0 top-64"
+                />
             </div>
         </nav>
     );
