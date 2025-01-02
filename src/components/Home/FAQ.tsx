@@ -31,7 +31,7 @@ const FAQ = () => {
                     cascade={true}
                     triggerOnce={true}
                 >
-                    <h2 className="oswald font-bold text-[40px] md:text-[46px] leading-[130%] tracking-[2%] text-nowrap">
+                    <h2 className="oswald font-bold text-[40px] md:text-[46px] leading-[130%] tracking-[2%] text-wrap md2:text-nowrap">
                         {faq.header}
                     </h2>
                 </Fade>
