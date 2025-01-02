@@ -105,8 +105,8 @@ const Navbar = ({ scrollTrigger }: Props) => {
             {/* Navlinks Mobile */}
             <div
                 className={`md:hidden z-10 fixed inset-0 ${
-                    toggleBurger ? "top-[70px]" : "top-[-755px]"
-                } bg-white w-full flex flex-col items-center py-12 duration-500 overflow-y-auto h-[100vh]`}
+                    toggleBurger ? "top-[70px]" : "top-[-100vh]"
+                } bg-white w-full flex flex-col items-center py-12 duration-500 overflow-y-auto h-[100vh] `}
             >
                 <ul className="flex flex-col items-center gap-12">
                     {navLinks.map((link) => {
