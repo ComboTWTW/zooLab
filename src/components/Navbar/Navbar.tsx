@@ -73,8 +73,8 @@ const Navbar = ({ scrollTrigger }: Props) => {
                                         href={link.linkTo}
                                         className={`montserrat ${
                                             scrollTrigger
-                                                ? `text-black duration-200`
-                                                : `text-white duration-200`
+                                                ? `text-black  hover:underline hover:decoration-mainRed duration-0  hover:decoration-[2px] hover:underline-offset-4`
+                                                : `text-white  hover:underline hover:decoration-mainRed duration-0  hover:decoration-[2px] hover:underline-offset-4`
                                         } hover:underline hover:decoration-mainRed duration-0  hover:decoration-[2px] hover:underline-offset-4`}
                                     >
                                         {link.tittle}
