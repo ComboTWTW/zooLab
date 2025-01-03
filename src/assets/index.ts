@@ -54,6 +54,7 @@ import footer_apple from "./footer/footer-apple.png";
 import footer_curl_bot from "./footer/footer-curl-bottom.png";
 import whatsUp_icon from "./footer/whatsUp-icon.svg";
 import telegram_icon from "./footer/telegram-icon.svg";
+import footer_top_lines from "./footer/footer_top_lines.svg";
 
 export {
     navbar_logo,
@@ -101,4 +102,5 @@ export {
     footer_curl_bot,
     whatsUp_icon,
     telegram_icon,
+    footer_top_lines,
 };
