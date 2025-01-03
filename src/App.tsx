@@ -13,11 +13,14 @@ function App() {
 
     return (
         <Router>
-            <div className="flex flex-col items-center overflow-hidden w-full ">
+            <div className="flex flex-col items-center overflow-hidden w-full relative">
                 <Navbar scrollTrigger={scrollTrigger} />
                 <Scrollama offset={0} onStepEnter={scrollCallback}>
                     <Step>
-                        <div className="min-w-[100px] min-h-[100px] bg-transparent absolute top-32 z-20"></div>
+                        <div
+                            style={{ height: "calc(100% + 100vh)" }}
+                            className="min-w-[100px]   bg-transparent bottom-0 absolute top-32 z-20"
+                        ></div>
                     </Step>
                 </Scrollama>
 
