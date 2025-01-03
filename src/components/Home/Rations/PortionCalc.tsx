@@ -5,15 +5,16 @@ import { Fade } from "react-awesome-reveal";
 const PortionCalc = () => {
     return (
         <div className="relative w-full flex justify-center">
-            <div className="max-w-[1200px] w-full  px-4  flex flex-col items-center justify-center mt-14 md:mt-20 mb-20">
+            <div className="max-w-[1200px] w-full   px-4  flex flex-col items-center justify-center mt-14 md:mt-20 mb-20">
                 <div className="w-full bg-pinkHover  py-8 px-7 md:py-14 md:pl-12 md:pr-12 lg:pr-[120px] flex flex-col md:flex-row items-center  md:items-center gap-7 md:gap-20  lg:gap-36 ">
                     <Fade
                         direction="up"
                         damping={0.2}
                         cascade={true}
                         triggerOnce={true}
+                        className="z-[3]"
                     >
-                        <p className="montserrat  md:max-w-[680px] z-[2] font-medium text-xl md:text-[28px] leading-[140%] text-center md:text-start">
+                        <p className="montserrat  md:max-w-[680px]  font-medium text-xl md:text-[28px] leading-[140%] text-center md:text-start">
                             {rationCalc.text}
                         </p>
                     </Fade>
@@ -34,7 +35,7 @@ const PortionCalc = () => {
             <img
                 src={calc_curl}
                 alt="Background curly line"
-                className="calcCurlMobile absolute  md:top-[20%] md:max-w-[150%]  lg:top-[23%] lg:max-w-[100%]"
+                className="calcCurlMobile absolute z-[1]  md:top-[20%] md:max-w-[150%]  lg:top-[23%] lg:max-w-[100%]"
             />
 
             {/* <img
