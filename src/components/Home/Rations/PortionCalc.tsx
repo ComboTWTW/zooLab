@@ -1,8 +1,20 @@
+import { useEffect, useState } from "react";
 import { calc_curl } from "../../../assets";
 import { rationCalc } from "../../../constants";
 import { Fade } from "react-awesome-reveal";
+import RationClacPopup from "./RationClacPopup";
 
 const PortionCalc = () => {
+    const [calcClick, setCalcClick] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (calcClick) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+    }, [calcClick]);
+
     return (
         <div className="relative w-full flex justify-center">
             <div className="max-w-[1200px] w-full   px-4  flex flex-col items-center justify-center mt-14 md:mt-20 mb-20">
@@ -19,7 +31,12 @@ const PortionCalc = () => {
                         </p>
                     </Fade>
 
-                    <button className="montserrat font-semibold z-[2] text-white leading-[140%] rounded-[8px] bg-mainRed px-11 py-4 md:hover:bg-mainRedHove md:duration-200">
+                    <button
+                        onClick={() => {
+                            setCalcClick(true);
+                        }}
+                        className="montserrat font-semibold z-[2] text-white leading-[140%] rounded-[8px] bg-mainRed px-11 py-4 md:hover:bg-mainRedHove md:duration-200"
+                    >
                         <Fade
                             direction="up"
                             damping={0.2}
@@ -43,6 +60,8 @@ const PortionCalc = () => {
                 alt="Background curly line"
                 className="absolute top-[14%] left-[4%] min-w-[300%] slides600:min-w-[200%] slides600:top-[17%] slides600:left-[2%]  md: md:min-w-[130%] "
             /> */}
+
+            {calcClick && <RationClacPopup setCalcClick={setCalcClick} />}
         </div>
     );
 };

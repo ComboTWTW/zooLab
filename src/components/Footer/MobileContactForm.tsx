@@ -74,7 +74,7 @@ const MobileContactForm = () => {
                     borderRadius: "2px",
                     fontFamily: "Montserrat, sans-serif",
                     input: { color: "white" },
-                    height: 122,
+                    minHeight: 122,
                 }}
                 InputLabelProps={{
                     style: {

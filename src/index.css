@@ -1,64 +1,64 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
 
+/* Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
 
 .oswald {
-  font-family: "Oswald", sans-serif;
+    font-family: "Oswald", sans-serif;
 }
 
 .montserrat {
-  font-family: "Montserrat", sans-serif;
+    font-family: "Montserrat", sans-serif;
 }
-
 
 /* MediaQuerries for Portions Slider pagination */
 
 @media (max-width: 767px) {
-  .pag {
-    position: relative;
-    right: 20vw;
-    
-  }
+    .pag {
+        position: relative;
+        right: 20vw;
+    }
 }
 
 @media (max-width: 599px) {
-  .pag {
-    position: relative;
-    right: 40vw;
-    
-  }
+    .pag {
+        position: relative;
+        right: 40vw;
+    }
 }
 
 @media (max-width: 459px) {
-  .pag {
-    position: relative;
-    right: 29vw;
-    
-  }
+    .pag {
+        position: relative;
+        right: 29vw;
+    }
 }
 
 @media (max-width: 459px) {
-  .pag {
-    position: relative;
-    right: 29vw;
-    
-  }
+    .pag {
+        position: relative;
+        right: 29vw;
+    }
 }
 
 @media (max-width: 767px) {
-  .calcCurlMobile {
-    position: absolute;
-    max-width: 450%;
-    left: 2%;
-    top: 14%;
-    
-  }
+    .calcCurlMobile {
+        position: absolute;
+        max-width: 450%;
+        left: 2%;
+        top: 14%;
+    }
 }
-
-
-
