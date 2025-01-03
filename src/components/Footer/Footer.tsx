@@ -8,6 +8,7 @@ import {
     telegram_icon,
 } from "../../assets";
 import { Fade } from "react-awesome-reveal";
+import MobileContactForm from "./MobileContactForm";
 
 const Footer = () => {
     return (
@@ -36,20 +37,21 @@ const Footer = () => {
                         </p>
                     </Fade>
 
-                    <Fade
-                        direction="up"
-                        damping={0.1}
-                        cascade={true}
-                        triggerOnce={true}
-                    >
-                        <a
-                            href="tel:+79000000000"
-                            className="montserrat font-bold leading-[140%] mt-[35px] text-white"
+                    <div className="mt-[20px]">
+                        <Fade
+                            direction="up"
+                            damping={0.1}
+                            cascade={true}
+                            triggerOnce={true}
                         >
-                            +7 (900) 000-00-00
-                        </a>
-                    </Fade>
-
+                            <a
+                                href="tel:+79000000000"
+                                className="montserrat font-bold leading-[140%]  text-white"
+                            >
+                                +7 (900) 000-00-00
+                            </a>
+                        </Fade>
+                    </div>
                     <Fade
                         direction="up"
                         damping={0.1}
@@ -85,7 +87,7 @@ const Footer = () => {
                             </button>
                         </div>
 
-                        <p className="text-white montserrat leading-[140%] mt-5">
+                        <p className="text-white montserrat leading-[140%] mt-8">
                             Подписывайтесь на наш{" "}
                             <a
                                 href="#"
@@ -107,7 +109,9 @@ const Footer = () => {
                         </div>
                     </Fade>
 
-                    <form action="post"></form>
+                    <div className="w-full mt-4">
+                        <MobileContactForm />
+                    </div>
                 </div>
             </div>
 
