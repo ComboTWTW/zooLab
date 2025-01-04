@@ -103,7 +103,7 @@ const CalcForm = () => {
                         borderRadius: "8px",
                     },
                 }}
-                type="number"
+                type="tel"
             />
 
             <TextField
