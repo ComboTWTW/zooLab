@@ -30,7 +30,7 @@ function App() {
                         <Step>
                             <div
                                 style={{ height: "calc(100% + 100vh)" }}
-                                className="min-w-[100px]   bg-transparent bottom-0 absolute top-32 z-20"
+                                className="min-w-[1px]   bg-transparent bottom-0 absolute top-32 z-20"
                             ></div>
                         </Step>
                     </Scrollama>
