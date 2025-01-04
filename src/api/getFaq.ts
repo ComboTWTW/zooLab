@@ -1,5 +1,5 @@
 export const fetchFAQ = async (): Promise<faqT> => {
-    const response = await fetch("http://localhost:3308/api/faq");
+    const response = await fetch("/api/faq");
     if (!response.ok) {
         throw new Error("Failed to fetch faq");
     }

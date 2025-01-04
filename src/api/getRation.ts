@@ -1,5 +1,5 @@
 export const fetchRations = async (): Promise<rationsT> => {
-    const response = await fetch("http://localhost:3308/api/rations");
+    const response = await fetch("/api/rations");
     if (!response.ok) {
         throw new Error("Failed to fetch rations");
     }
