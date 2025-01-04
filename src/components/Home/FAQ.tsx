@@ -5,8 +5,10 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Fade } from "react-awesome-reveal";
+import { fetchFAQ, faqT } from "../../api/getFaq";
+import { useQuery } from "@tanstack/react-query";
 
 const FAQ = () => {
     const [openedArr, setOpenedArr] = useState<number[]>([0]);
@@ -21,6 +23,23 @@ const FAQ = () => {
               ])
             : setOpenedArr([...openedArr, index]);
     };
+
+    const {
+        data: faqData,
+        isError,
+        refetch,
+        isSuccess,
+        error,
+    } = useQuery<faqT>({
+        queryKey: ["fetchFAQ"],
+        queryFn: fetchFAQ,
+    });
+
+    useEffect(() => {
+        refetch();
+        isError && console.log(error.message);
+        isSuccess && console.log(faqData);
+    }, []);
 
     return (
         <div className="w-full flex justify-center mt-[88px]">
@@ -38,13 +57,14 @@ const FAQ = () => {
 
                 {/* Accordion */}
                 <div className={`w-full md:mt-[-25px] flex flex-col `}>
-                    {faq.list.map((item, index) => {
+                    {faqData?.map((item, index) => {
                         return (
                             <Fade
                                 direction="up"
                                 damping={0.1}
                                 cascade={true}
                                 triggerOnce={true}
+                                key={item.text}
                             >
                                 <Accordion
                                     /* Opens item with this index if its index is inside openedArr */
@@ -81,7 +101,7 @@ const FAQ = () => {
                                                 }
                                                 className="text-black montserrat font-semibold leading-[140%] text-[16px] md:text-lg pr-[60px] "
                                             >
-                                                {item.header}
+                                                {item.title}
                                             </span>
                                         </Typography>
                                     </AccordionSummary>
