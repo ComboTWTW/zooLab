@@ -36,7 +36,7 @@ const CardsMobile = () => {
 
     return (
         <div className="flex justify-start md:justify-center min-w-[160%] sm:min-w-[180%]  slides600:max-w-full slides600:min-w-[140%] xs:min-w-[140%] xs:max-w-[140%] md:min-w-full md:max-w-full">
-            <div className="overflow-hidden flex justify-start md:max-w-[1200px] md:w-full">
+            <div className="overflow-hidden flex justify-start md:max-w-[1200px]  md:w-full">
                 {isSuccess && (
                     <Swiper
                         style={{
@@ -89,11 +89,11 @@ const CardsMobile = () => {
                         {rationsData?.map((card, index) => {
                             return (
                                 <SwiperSlide
-                                    className={`overflow-hidden flex justify-center relative pl-5 xs:pr-5 `}
+                                    className={`overflow-hidden flex py-10 justify-center relative pl-5 xs:pr-5`}
                                 >
                                     {({ isPrev, isNext }) => (
                                         <div
-                                            className={`flex flex-col montserrat items-start ${
+                                            className={`flex flex-col montserrat justify-between h-full ${
                                                 isNext &&
                                                 "opacity-50 sm:opacity-100"
                                             } ${
@@ -101,27 +101,29 @@ const CardsMobile = () => {
                                                 "opacity-50 sm:opacity-100"
                                             }`}
                                         >
-                                            <img
-                                                src={card.image}
-                                                alt={card.image}
-                                                className=""
-                                            />
-                                            <h4 className=" font-bold leading-[130%] mt-10">
-                                                {card.title}
-                                            </h4>
-                                            <p className="text-addGray text-[13px] mt-1">
-                                                {card.composition}
-                                            </p>
+                                            <div className="flex flex-col montserrat items-start justify-items-start flex-grow">
+                                                <div className="overflow-hidden w-full h-[60%] ">
+                                                    <img
+                                                        src={card.image}
+                                                        alt={card.image}
+                                                        className="object-fill w-full h-full"
+                                                    />
+                                                </div>
+                                                <h4 className="font-bold leading-[130%] mt-10">
+                                                    {card.title}
+                                                </h4>
+                                                <p className="text-addGray text-[13px] mt-1">
+                                                    {card.composition}
+                                                </p>
+                                                <p className="text-mainGray text-[13px] leading-[140%] mt-4 max-w-[230px] line-clamp-4">
+                                                    {card.description}
+                                                </p>
+                                                <p className="text-addGray text-[13px] mt-2">
+                                                    {card.weight}
+                                                </p>
+                                            </div>
 
-                                            <p className="text-mainGray text-[13px] leading-[140%] mt-4 max-w-[230px]">
-                                                {card.description}
-                                            </p>
-
-                                            <p className="text-addGray text-[13px] mt-2">
-                                                {card.weight}
-                                            </p>
-
-                                            <button className="rounded-[8px] mt-5 px-9 py-3 border-solid border-mainRed border-[1px] montserrat font-semibold text-mainRed leading-[140%] mb-[60px] md:hover:bg-pinkHover md:hover:border-pinkHover md:duration-200">
+                                            <button className="rounded-[8px] px-9 py-3 border-solid border-mainRed border-[1px] montserrat font-semibold text-mainRed leading-[140%] mt-5  md:hover:bg-pinkHover md:hover:border-pinkHover md:duration-200">
                                                 Заказать
                                             </button>
                                         </div>
