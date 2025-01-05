@@ -16,7 +16,11 @@ type PostData = {
     question: string;
 };
 
-const CalcForm = () => {
+interface Props {
+    setSuccessSend: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const CalcForm = ({ setSuccessSend }: Props) => {
     const [formData, setFormData] = useState<PostData>({
         size: "Взрослая собака",
         weight: "",
@@ -55,7 +59,6 @@ const CalcForm = () => {
             return response.json();
         },
         onSuccess: (data) => {
-            alert(data.message);
             setFormData({
                 size: "Взрослая собака",
                 weight: "",
@@ -64,6 +67,7 @@ const CalcForm = () => {
                 tel_number: "",
                 question: "",
             });
+            setSuccessSend(true);
         },
         onError: (error: any) => {
             alert(error.message);
