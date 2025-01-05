@@ -7,7 +7,7 @@ router.post('/calc_ration', (req, res) => {
   const { size, weight, age, name, tel_number, question } = req.body;
 
   if (!size || !weight || !age || !name || !tel_number) {
-    return res.status(400).json({ error: 'Name and question are required fields' });
+    return res.status(400).json({ error: 'All field are required (except question)' });
   }
 
   const query = `
