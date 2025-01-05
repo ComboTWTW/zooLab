@@ -1,24 +1,46 @@
 import express from 'express';
-import cors from 'cors';
+import mysql from 'mysql2';
 import dotenv from 'dotenv';
-import faqRoutes from './routes/faq.js';
+import fs from 'fs';
 import rationsRoutes from './routes/rations.js';
+import faqRoutes from './routes/faq.js';
+import cors from 'cors';
 import calcRationPost from './routes/calcRationPost.js';
 
-dotenv.config();
+
+dotenv.config(); 
 
 const app = express();
-const port = process.env.PORT || 5000;
 
 
-app.use(cors());
-app.use(express.json()); 
+const connection = mysql.createConnection({
+  host: process.env.DB_HOST, 
+  user: process.env.DB_USER,  
+  password: process.env.DB_PASSWORD, 
+  database: process.env.DB_NAME,  
+  port: process.env.DB_PORT, 
+  ssl: {
+    ca: fs.readFileSync('./server/certs/ca.pem'),  // Path to CA certificate
+  },
+});
+
+connection.connect((err) => {
+  if (err) {
+    console.error('Error connecting to the database:', err);
+  } else {
+    console.log('Connected to MySQL database!');
+  }
+});
+
+app.use(cors()); // Enable cross-origin requests
+app.use(express.json()); // Parse JSON request bodies
+
+app.use('/api', rationsRoutes(connection));
+app.use('/api', faqRoutes(connection));
+app.use('/api', calcRationPost(connection));
 
 
-app.use('/api', rationsRoutes);
-app.use('/api', faqRoutes);
-app.use('/api', calcRationPost);
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+// Start the server
+app.listen(3308, () => {
+  console.log('Backend server is running on http://localhost:3308');
 });
