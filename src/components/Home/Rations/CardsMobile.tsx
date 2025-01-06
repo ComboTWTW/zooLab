@@ -12,9 +12,12 @@ import "swiper/css/pagination";
 import "../../../index.css";
 
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchRations } from "../../../api/getRation";
 import { rationsT } from "../../../api/getRation";
+import OrderPopUp from "./OrderPopUp/OrderPopUp";
+
+useState;
 
 const CardsMobile = () => {
     const {
@@ -33,6 +36,17 @@ const CardsMobile = () => {
         isError && console.log(error.message);
         isSuccess && console.log(rationsData);
     }, []);
+
+    const [orderClick, setOrderClick] = useState<boolean>(false);
+    const [clickIndex, setCickIndex] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (orderClick) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+    }, [orderClick]);
 
     return (
         <div className="flex justify-start md:justify-center min-w-[160%] sm:min-w-[180%]  slides600:max-w-full slides600:min-w-[140%] xs:min-w-[140%] xs:max-w-[140%] md:min-w-full md:max-w-full">
@@ -123,7 +137,13 @@ const CardsMobile = () => {
                                                 </p>
                                             </div>
 
-                                            <button className="rounded-[8px] px-9 py-3 border-solid border-mainRed border-[1px] montserrat font-semibold text-mainRed leading-[140%] mt-5  md:hover:bg-pinkHover md:hover:border-pinkHover md:duration-200">
+                                            <button
+                                                onClick={() => {
+                                                    setOrderClick(true);
+                                                    setCickIndex(index);
+                                                }}
+                                                className="rounded-[8px] px-9 py-3 border-solid border-mainRed border-[1px] montserrat font-semibold text-mainRed leading-[140%] mt-5  md:hover:bg-pinkHover md:hover:border-pinkHover md:duration-200"
+                                            >
                                                 Заказать
                                             </button>
                                         </div>
@@ -134,6 +154,14 @@ const CardsMobile = () => {
                     </Swiper>
                 )}
             </div>
+            {/* If order was clicked  */}
+            {orderClick && isSuccess && clickIndex !== null && (
+                <OrderPopUp
+                    setOrderClick={setOrderClick}
+                    rationsData={rationsData}
+                    clickIndex={clickIndex}
+                />
+            )}
         </div>
     );
 };
