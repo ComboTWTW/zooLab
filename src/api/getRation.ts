@@ -13,5 +13,8 @@ export type rationsT = {
     composition: string;
     description: string;
     weight: string;
+    composition_full: string;
+    nutrition_value: string;
+    price: number;
     created_at: string;
 }[];
