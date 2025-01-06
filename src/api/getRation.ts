@@ -9,6 +9,7 @@ export const fetchRations = async (): Promise<rationsT> => {
 export type rationsT = {
     id: number;
     image: string;
+    image_big: string;
     title: string;
     composition: string;
     description: string;
