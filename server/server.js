@@ -6,6 +6,7 @@ import rationsRoutes from './routes/rations.js';
 import faqRoutes from './routes/faq.js';
 import cors from 'cors';
 import calcRationPost from './routes/calcRationPost.js';
+import placeOrder from './routes/placeOrder.js';
 
 
 dotenv.config(); 
@@ -38,6 +39,7 @@ app.use(express.json()); // Parse JSON request bodies
 app.use('/api', rationsRoutes(connection));
 app.use('/api', faqRoutes(connection));
 app.use('/api', calcRationPost(connection));
+app.use('/api', placeOrder(connection));
 
 
 // Start the server

@@ -390,7 +390,11 @@ const CalcForm = ({ setSuccessSend }: Props) => {
                         tel_number: null,
                     });
                 }}
-                className="montserrat font-semibold z-[2] text-white leading-[140%] mt-[45px] rounded-[8px] bg-mainRed px-11 py-4 md:hover:bg-mainRedHove md:duration-200"
+                className={`montserrat font-semibold z-[2] text-white leading-[140%] mt-[45px] rounded-[8px] bg-mainRed px-11 py-4 md:hover:bg-mainRedHove md:duration-200 ${
+                    !Object.values(errorState).every(
+                        (item) => item === false
+                    ) && "opacity-65"
+                }`}
             >
                 Рассчитать
             </button>
