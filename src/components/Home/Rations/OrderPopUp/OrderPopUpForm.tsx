@@ -4,6 +4,7 @@ import { useOnClickOutside } from "usehooks-ts";
 import { rationsT } from "../../../../api/getRation";
 import RationDescriptionPopUp from "./RationDescriptionPopUp";
 import OrderForm from "./OrderForm";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 interface Props {
     setOrderClick: (orderClick: boolean) => void;
@@ -25,8 +26,10 @@ const OrderPopUpForm = ({
     /* Order button in desc */
     const [orderDesc, setOrderDesc] = useState<boolean>(false);
 
+    const [succSent, setSuccSent] = useState<boolean>(false);
+
     return (
-        <div className="z-[51] w-full md:max-w-[900px]  px-8 py-8 md:px-8 md:py-8  xs:mx-8 md:p-16  opacity-100 max-h-[100vh]  bg-white flex flex-col gap-6  relative  overflow-y-auto">
+        <div className="z-[51] w-full md:max-w-[900px]    px-8 py-8 md:px-8 md:py-8  xs:mx-8 md:p-16  opacity-100 max-h-[100vh]  bg-white flex flex-col gap-6  relative  overflow-y-auto">
             <div className="w-full flex  flex-col items-start  gap-[34px] md:gap-[34px]  md:flex-row md:items-start">
                 <div className="hidden md:block relative overflow-hidden min-w-[50%] max-h-[450px]">
                     <img
@@ -45,13 +48,17 @@ const OrderPopUpForm = ({
                 </div>
 
                 <div className="flex flex-col md:self-start  max-w-[352px] ">
-                    <h3 className="montserrat font-bold text-[20px] leading-[140%] text-nowrap">
-                        {rationsData[clickIndex].title}
-                    </h3>
+                    {!succSent && (
+                        <h3 className="montserrat font-bold text-[20px] leading-[140%] text-nowrap">
+                            {rationsData[clickIndex].title}
+                        </h3>
+                    )}
 
-                    <p className="montserrat text-[15px] text-addGray mt-1 ">
-                        {rationsData[clickIndex].composition}
-                    </p>
+                    {!succSent && (
+                        <p className="montserrat text-[15px] text-addGray mt-1 ">
+                            {rationsData[clickIndex].composition}
+                        </p>
+                    )}
 
                     {!orderDesc ? (
                         <div className="md:max-w-[366px]">
@@ -62,12 +69,30 @@ const OrderPopUpForm = ({
                                 orderDesc={orderDesc}
                             />
                         </div>
-                    ) : (
+                    ) : !succSent ? (
                         <div className="w-full">
                             <OrderForm
                                 rationsData={rationsData[clickIndex]}
                                 setSelectFpcus={setSelectFpcus}
+                                setSuccSent={setSuccSent}
                             />
+                        </div>
+                    ) : (
+                        <div className="w-full md:mt-[100px] flex flex-col gap-5">
+                            <h2 className="oswald font-bold text-[40px] text-mainRed leading-[130%] tracking-[2%] mt-8 md:mt-0">
+                                Спасибо!
+                            </h2>
+
+                            <p className="montserrat text-[15px]">
+                                Ваш заказ оформлен и передан менеджеру. Мы
+                                свяжемся с вами для уточнения и подтверждения в
+                                ближайшее время.
+                            </p>
+                            <p className="montserrat text-[15px]">
+                                Если вы захотите дополнить свой заказ или
+                                уточнить какие-то детали – вы сможете это
+                                сделать у оператора.
+                            </p>
                         </div>
                     )}
                 </div>

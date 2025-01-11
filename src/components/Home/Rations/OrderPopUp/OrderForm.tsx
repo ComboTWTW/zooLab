@@ -6,7 +6,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Checkbox from "@mui/material/Checkbox";
 import { useMutation } from "@tanstack/react-query";
-import { error } from "console";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 type PostData = {
     ration_id: number;
@@ -21,8 +21,9 @@ type PostData = {
 interface Props {
     rationsData: rationsT[number];
     setSelectFpcus: (selectFpcus: boolean) => void;
+    setSuccSent: (succSent: boolean) => void;
 }
-const OrderForm = ({ rationsData, setSelectFpcus }: Props) => {
+const OrderForm = ({ rationsData, setSelectFpcus, setSuccSent }: Props) => {
     /* Array with weight data */
     const sortedWeight: string[] = rationsData.weight
         .split(" / ")
@@ -68,6 +69,7 @@ const OrderForm = ({ rationsData, setSelectFpcus }: Props) => {
 
         setFormData({ ...formData, phone_number: formattedValue });
     };
+    const navigate = useNavigate();
     /* React-query Post */
     const mutation = useMutation({
         mutationFn: async (formData: PostData) => {
@@ -95,6 +97,7 @@ const OrderForm = ({ rationsData, setSelectFpcus }: Props) => {
                 quantity: 1,
                 price: rationsData.price,
             });
+            setSuccSent(true);
         },
         onError: (error: any) => {
             alert(error.message);
@@ -103,7 +106,7 @@ const OrderForm = ({ rationsData, setSelectFpcus }: Props) => {
 
     return (
         <Fragment>
-            <FormControl component="form" className="w-full max-w-[290px]">
+            <FormControl component="form" className="w-full ">
                 {/* Name */}
                 <TextField
                     label={!errorState.name ? "Имя" : "Имя*"}
