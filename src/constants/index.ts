@@ -312,3 +312,25 @@ export const portionsCalc = {
     text: "Заполните информацию и мы свяжемся с вами, чтобы подсказать с подбором рациона для вашего хвостика. Или напишите нам в мессендерах WhatsApp и Telegram.",
     radioButtons: ["Взрослая собака", "Щенок"],
 };
+
+export const dashBopardNavLink: {
+    title: string;
+    type: string;
+    linkTo: string;
+}[] = [
+    {
+        title: "Продукция",
+        type: "products",
+        linkTo: "/dashboard?menu=products",
+    },
+    {
+        title: "Вопрос-Ответ",
+        type: "questions",
+        linkTo: "/dashboard?menu=questions",
+    },
+    {
+        title: "Заказы",
+        type: "orders",
+        linkTo: "/dashboard?menu=orders",
+    },
+];
