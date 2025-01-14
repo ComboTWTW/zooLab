@@ -4,7 +4,7 @@ const rationsRoutes = (connection) => {
   const router = express.Router();
 
   router.get('/rations', (req, res) => {
-    connection.query('SELECT * FROM rations', (err, results) => {
+    connection.query('SELECT * FROM rations WHERE deleted = FALSE', (err, results) => {
       if (err) {
         console.error('Error fetching rations:', err);
         return res.status(500).send('Error fetching rations');

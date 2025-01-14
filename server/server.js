@@ -8,6 +8,7 @@ import cors from 'cors';
 import calcRationPost from './routes/calcRationPost.js';
 import placeOrder from './routes/placeOrder.js';
 import auth from './routes/auth.js';
+import deleteRation from './routes/calcRationPost.js';
 
 
 dotenv.config(); 
@@ -41,6 +42,7 @@ app.use('/api', rationsRoutes(connection));
 app.use('/api', faqRoutes(connection));
 app.use('/api', calcRationPost(connection));
 app.use('/api', placeOrder(connection));
+app.use('/api', auth(connection));
 app.use('/api', auth(connection));
 
 
