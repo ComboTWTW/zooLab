@@ -24,6 +24,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import { useMutation } from "@tanstack/react-query";
+import { NumericEditCell, renderEditCell } from "./NumericEditCell";
 
 interface Props {
     rationsData: rationsT;
@@ -143,8 +144,6 @@ const ProductsTable = ({ rationsData }: Props) => {
     /* ACTIONS LOGIC END--------------------------------------- */
 
     /* TABLE SET-UP------------------------------------------------ */
-
-    const [newRation, setNewRation] = useState<rationsT>(rationsData);
 
     const processRowUpdate = (newRow: any) => {
         const updatedRow = { ...newRow, isNew: false };
@@ -486,39 +485,7 @@ const ProductsTable = ({ rationsData }: Props) => {
                     {params.value}
                 </span>
             ),
-            renderEditCell: (params) => {
-                let tempValue = params.value;
-
-                const handleChange = (e: any) => {
-                    tempValue = e.target.value;
-                };
-
-                const handleBlur = () => {
-                    if (tempValue.trim() === "") {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: params.value,
-                        }); // Revert to previous value
-                    } else {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: tempValue,
-                        }); // Save new value
-                    }
-                };
-
-                return (
-                    <textarea
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full max-h-full resize-none px-2"
-                    >
-                        {tempValue}
-                    </textarea>
-                );
-            },
+            renderEditCell: (params) => <NumericEditCell params={params} />,
         },
         {
             field: "created_at",
