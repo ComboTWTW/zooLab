@@ -38,29 +38,47 @@ const ProductsTable = ({ rationsData }: Props) => {
     const handlePageChange = (newPage: number) => {
         console.log(newPage);
         setSearchParams((prev) => {
-            prev.set("p", (newPage + 1).toString()); // Set page number
             prev.set("menu", "products"); // Ensure menu=products is always present
+            prev.set("p", (newPage + 1).toString()); // Set page number
+
             return prev;
         });
     };
 
-    /* PAGINATION LOGIC -------------------------------- */
-
-    /* ------------------------------------------------ */
+    /* Rows and RowModel states*/
 
     const [rows, setRows] = useState(rationsData);
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
-    /* ------------------------------------------------ */
 
-    /* Conformation window state Delete */
+    /* ------------------------------------------------------------------------------------------------------------------------------ */
+    /* DELETE RATION HANDLING */
+
+    /* If delete buttom was clicked */
+
+    const handleDeleteClick = (id: GridRowId) => () => {
+        setSelectedRowId(id); // Store the id of the row to be deleted
+        setOpenDialog(true); // Open the confirmation dialog (are you sure you want to delete)
+    };
+
+    /* Conformation window if Delete button was clicked  */
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedRowId, setSelectedRowId] = useState<GridRowId | null>(null);
 
-    const [successDeleteMessage, setSuccessDeleteMessage] = useState<
-        string | null
-    >(null); //if succsefull delete message state
+    /* If in delete dialog window "cancel" button was clicked  */
+    const handleCancelDelete = () => {
+        setOpenDialog(false); // Close the delete dialog without doing anything
+    };
 
-    /* React-query post for deleting ration */
+    /* If in delete dialog windows "delete" button was clicked  */
+    const handleConfirmDelete = async () => {
+        if (selectedRowId === null) return; // Check if selectedRowId is valid
+
+        await mutation.mutateAsync({ id: +selectedRowId }); // Pass the selectedRowId to the mutation function
+        setRows((oldRows) => oldRows.filter((row) => row.id !== selectedRowId)); // Update the rows in the table
+        setOpenDialog(false); // Close the dialog
+    };
+
+    /* React-query DELETING mutation */
     const mutation = useMutation({
         mutationFn: async (rationDelete: { id: number }) => {
             const response = await fetch("/api/delete_ration", {
@@ -79,7 +97,7 @@ const ProductsTable = ({ rationsData }: Props) => {
         },
         onSuccess: (data, rationDelete: { id: number }) => {
             setSuccessDeleteMessage(
-                `Ration with id=${rationDelete.id} was successfully deleted`
+                `Рацион с id=${rationDelete.id} был успешно помещен в корзину`
             ); // Set success message
         },
         onError: (error: any) => {
@@ -87,9 +105,13 @@ const ProductsTable = ({ rationsData }: Props) => {
         },
     });
 
-    /* ------------------------------------------------ */
+    /* Message state if deleting was succsefflul */
+    const [successDeleteMessage, setSuccessDeleteMessage] = useState<
+        string | null
+    >(null);
 
-    /* ACTIONS LOGIC --------------------------------------- */
+    /* ------------------------------------------------------------------------------------------------------------------------------ */
+    /* EDIT RATION HANDLING */
 
     const handleEditClick = (id: GridRowId) => () => {
         setRowModesModel((oldModel) => ({
@@ -103,24 +125,6 @@ const ProductsTable = ({ rationsData }: Props) => {
             ...oldModel,
             [id]: { mode: GridRowModes.View },
         }));
-    };
-
-    const handleDeleteClick = (id: GridRowId) => () => {
-        setSelectedRowId(id); // Store the id of the row to be deleted
-        setOpenDialog(true); // Open the confirmation dialog
-    };
-
-    /* DELTE CONFORMATION DIALOG  */
-    const handleConfirmDelete = async () => {
-        if (selectedRowId === null) return; // Check if selectedRowId is valid
-
-        await mutation.mutateAsync({ id: +selectedRowId }); // Pass the selectedRowId to the mutation function
-        setRows((oldRows) => oldRows.filter((row) => row.id !== selectedRowId)); // Update the rows in the table
-        setOpenDialog(false); // Close the dialog
-        console.log("Deleted row", selectedRowId);
-    };
-    const handleCancelDelete = () => {
-        setOpenDialog(false); // Close the dialog without doing anything
     };
 
     /* DELTE CONFORMATION DIALOG  ------------------------*/
@@ -139,6 +143,8 @@ const ProductsTable = ({ rationsData }: Props) => {
     /* ACTIONS LOGIC END--------------------------------------- */
 
     /* TABLE SET-UP------------------------------------------------ */
+
+    const [newRation, setNewRation] = useState<rationsT>(rationsData);
 
     const processRowUpdate = (newRow: any) => {
         const updatedRow = { ...newRow, isNew: false };
@@ -160,10 +166,20 @@ const ProductsTable = ({ rationsData }: Props) => {
                     src={params.value}
                     alt="Product"
                     style={{
-                        width: "100px",
-                        height: "100px",
+                        width: "full",
+                        height: "full",
                         objectFit: "cover",
-                        borderRadius: "8px",
+                    }}
+                />
+            ),
+            renderEditCell: (params) => (
+                <img
+                    src={params.value}
+                    alt="Product"
+                    style={{
+                        width: "full",
+                        height: "full",
+                        objectFit: "cover",
                     }}
                 />
             ),
@@ -177,33 +193,243 @@ const ProductsTable = ({ rationsData }: Props) => {
                     src={params.value}
                     alt="Product"
                     style={{
-                        width: "100px",
-                        height: "100px",
+                        width: "full",
+                        height: "full",
                         objectFit: "cover",
-                        borderRadius: "8px",
+                    }}
+                />
+            ),
+            renderEditCell: (params) => (
+                <img
+                    src={params.value}
+                    alt="Product"
+                    style={{
+                        width: "full",
+                        height: "full",
+                        objectFit: "cover",
                     }}
                 />
             ),
         },
-        { field: "title", headerName: "Название", width: 100, editable: true },
+        {
+            field: "title",
+            headerName: "Название",
+            width: 100,
+            editable: true,
+            renderCell: (params) => (
+                <span className="line-clamp-5 px-1" title={params.value}>
+                    {params.value}
+                </span>
+            ),
+            renderEditCell: (params) => {
+                let tempValue = params.value;
+
+                const handleChange = (e: any) => {
+                    tempValue = e.target.value;
+                };
+
+                const handleBlur = () => {
+                    if (tempValue.trim() === "") {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: params.value,
+                        }); // Revert to previous value
+                    } else {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: tempValue,
+                        }); // Save new value
+                    }
+                };
+
+                return (
+                    <textarea
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="w-full max-h-full resize-none px-2"
+                    >
+                        {tempValue}
+                    </textarea>
+                );
+            },
+        },
         {
             field: "composition",
             headerName: "Состав",
             width: 100,
             editable: true,
+            renderCell: (params) => (
+                <span className="line-clamp-5 px-1" title={params.value}>
+                    {params.value}
+                </span>
+            ),
+            renderEditCell: (params) => {
+                let tempValue = params.value;
+
+                const handleChange = (e: any) => {
+                    tempValue = e.target.value;
+                };
+
+                const handleBlur = () => {
+                    if (tempValue.trim() === "") {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: params.value,
+                        }); // Revert to previous value
+                    } else {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: tempValue,
+                        }); // Save new value
+                    }
+                };
+
+                return (
+                    <textarea
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="w-full max-h-full resize-none px-2"
+                    >
+                        {tempValue}
+                    </textarea>
+                );
+            },
         },
         {
             field: "description",
             headerName: "Описание",
             width: 150,
             editable: true,
+            renderCell: (params) => (
+                <span className="line-clamp-5 px-1" title={params.value}>
+                    {params.value}
+                </span>
+            ),
+            renderEditCell: (params) => {
+                let tempValue = params.value;
+
+                const handleChange = (e: any) => {
+                    tempValue = e.target.value;
+                };
+
+                const handleBlur = () => {
+                    if (tempValue.trim() === "") {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: params.value,
+                        }); // Revert to previous value
+                    } else {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: tempValue,
+                        }); // Save new value
+                    }
+                };
+
+                return (
+                    <textarea
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="w-full max-h-full resize-none px-2"
+                    >
+                        {tempValue}
+                    </textarea>
+                );
+            },
         },
-        { field: "weight", headerName: "Вес", width: 100, editable: true },
+        {
+            field: "weight",
+            headerName: "Вес",
+            width: 100,
+            editable: true,
+            renderCell: (params) => (
+                <span className="line-clamp-5 px-1" title={params.value}>
+                    {params.value}
+                </span>
+            ),
+            renderEditCell: (params) => {
+                let tempValue = params.value;
+
+                const handleChange = (e: any) => {
+                    tempValue = e.target.value;
+                };
+
+                const handleBlur = () => {
+                    if (tempValue.trim() === "") {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: params.value,
+                        }); // Revert to previous value
+                    } else {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: tempValue,
+                        }); // Save new value
+                    }
+                };
+
+                return (
+                    <textarea
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="w-full max-h-full resize-none px-2"
+                    >
+                        {tempValue}
+                    </textarea>
+                );
+            },
+        },
         {
             field: "composition_full",
             headerName: "Описание (полн.)",
             width: 300,
             editable: true,
+            renderCell: (params) => (
+                <span className="line-clamp-5 px-1" title={params.value}>
+                    {params.value}
+                </span>
+            ),
+            renderEditCell: (params) => {
+                let tempValue = params.value;
+
+                const handleChange = (e: any) => {
+                    tempValue = e.target.value;
+                };
+
+                const handleBlur = () => {
+                    if (tempValue.trim() === "") {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: params.value,
+                        }); // Revert to previous value
+                    } else {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: tempValue,
+                        }); // Save new value
+                    }
+                };
+
+                return (
+                    <textarea
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="w-full max-h-full resize-none px-2"
+                    >
+                        {tempValue}
+                    </textarea>
+                );
+            },
         },
 
         {
@@ -211,12 +437,88 @@ const ProductsTable = ({ rationsData }: Props) => {
             headerName: "Пищ. ценность",
             width: 150,
             editable: true,
+            renderCell: (params) => (
+                <span className="line-clamp-5 px-1" title={params.value}>
+                    {params.value}
+                </span>
+            ),
+            renderEditCell: (params) => {
+                let tempValue = params.value;
+
+                const handleChange = (e: any) => {
+                    tempValue = e.target.value;
+                };
+
+                const handleBlur = () => {
+                    if (tempValue.trim() === "") {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: params.value,
+                        }); // Revert to previous value
+                    } else {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: tempValue,
+                        }); // Save new value
+                    }
+                };
+
+                return (
+                    <textarea
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="w-full max-h-full resize-none px-2"
+                    >
+                        {tempValue}
+                    </textarea>
+                );
+            },
         },
         {
             field: "price",
             headerName: "Цена",
             width: 60,
             editable: true,
+            renderCell: (params) => (
+                <span className="line-clamp-5 px-1" title={params.value}>
+                    {params.value}
+                </span>
+            ),
+            renderEditCell: (params) => {
+                let tempValue = params.value;
+
+                const handleChange = (e: any) => {
+                    tempValue = e.target.value;
+                };
+
+                const handleBlur = () => {
+                    if (tempValue.trim() === "") {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: params.value,
+                        }); // Revert to previous value
+                    } else {
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: tempValue,
+                        }); // Save new value
+                    }
+                };
+
+                return (
+                    <textarea
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className="w-full max-h-full resize-none px-2"
+                    >
+                        {tempValue}
+                    </textarea>
+                );
+            },
         },
         {
             field: "created_at",
@@ -307,9 +609,12 @@ const ProductsTable = ({ rationsData }: Props) => {
                 maxWidth="xs"
                 fullWidth
             >
-                <DialogTitle>Confirm Deletion</DialogTitle>
+                <DialogTitle>Подтвердить удаление</DialogTitle>
                 <DialogContent>
-                    <p>Are you sure you want to delete this product?</p>
+                    <p>
+                        Вы уверены, что хотите поместить в корзину рацион с id=
+                        {selectedRowId}
+                    </p>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCancelDelete}>Cancel</Button>
@@ -326,7 +631,7 @@ const ProductsTable = ({ rationsData }: Props) => {
                 maxWidth="xs"
                 fullWidth
             >
-                <DialogTitle>Success</DialogTitle>
+                <DialogTitle>Успех</DialogTitle>
                 <DialogContent dividers>
                     <p>{successDeleteMessage}</p>
                 </DialogContent>
