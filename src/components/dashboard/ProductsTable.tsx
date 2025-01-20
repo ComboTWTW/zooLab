@@ -25,6 +25,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import { useMutation } from "@tanstack/react-query";
 import { RenderEditCell } from "./RenderEditCell";
+import DragAndDropImage from "./DragAndDropImage";
+import { rations } from "../../constants";
 
 interface Props {
     rationsData: rationsT;
@@ -49,10 +51,11 @@ const ProductsTable = ({ rationsData }: Props) => {
     /* Rows and RowModel states*/
 
     const [rows, setRows] = useState(rationsData);
-    const [editedRows, setEditedRows] = useState();
+    const [editedRows, setEditedRows] = useState({});
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
 
     useEffect(() => {
+        console.log("edited rows");
         console.log(editedRows);
     }, [editedRows]);
 
@@ -141,6 +144,7 @@ const ProductsTable = ({ rationsData }: Props) => {
     /* Edit button was clicked */
     const [editCnt, setEditCnt] = useState<number>(0);
     const handleEditClick = (row: any, id: GridRowId) => () => {
+        setEditedRows(rationsData[+id]);
         console.log(editCnt);
         const handleEdit = () => {
             setRowModesModel((oldModel) => ({
@@ -201,22 +205,38 @@ const ProductsTable = ({ rationsData }: Props) => {
                     }}
                 />
             ),
-            renderEditCell: (params) => (
-                <img
-                    src={params.value}
-                    alt="Product"
-                    style={{
-                        width: "full",
-                        height: "full",
-                        objectFit: "cover",
-                    }}
-                />
-            ),
+            renderEditCell: (params) => {
+                const handleImageChange = (file: File) => {
+                    // Update the state with the new file or send it to the server
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const filePath = reader.result as string; // For preview or upload handling
+
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: filePath, // This is just an example; you might handle it differently
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                };
+
+                return (
+                    <DragAndDropImage
+                        setEditedRows={setEditedRows}
+                        params={params}
+                        editedRows={editedRows}
+                        rationsData={rationsData}
+                        handleImageChange={handleImageChange}
+                    />
+                );
+            },
         },
         {
             field: "image_big",
             headerName: "Картинка (большая)",
             width: 150,
+            editable: true,
             renderCell: (params) => (
                 <img
                     src={params.value}
@@ -228,17 +248,31 @@ const ProductsTable = ({ rationsData }: Props) => {
                     }}
                 />
             ),
-            renderEditCell: (params) => (
-                <img
-                    src={params.value}
-                    alt="Product"
-                    style={{
-                        width: "full",
-                        height: "full",
-                        objectFit: "cover",
-                    }}
-                />
-            ),
+            renderEditCell: (params) => {
+                const handleImageChange = (file: File) => {
+                    // Update the state with the new file or send it to the server
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        const filePath = reader.result as string; // For preview or upload handling
+                        params.api.setEditCellValue({
+                            id: params.id,
+                            field: params.field,
+                            value: filePath, // This is just an example; you might handle it differently
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                };
+
+                return (
+                    <DragAndDropImage
+                        setEditedRows={setEditedRows}
+                        params={params}
+                        editedRows={editedRows}
+                        rationsData={rationsData}
+                        handleImageChange={handleImageChange}
+                    />
+                );
+            },
         },
         {
             field: "title",

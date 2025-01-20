@@ -26,7 +26,7 @@ export const RenderEditCell = ({
                 setTempValue(value);
 
                 setEditedRows({
-                    ...rationsData[params.row.id],
+                    ...editedRows,
                     [params.colDef.field]: value,
                 });
             }
@@ -34,7 +34,7 @@ export const RenderEditCell = ({
             setTempValue(value);
 
             setEditedRows({
-                ...rationsData[params.row.id],
+                ...editedRows,
                 [params.colDef.field]: value,
             });
         }
@@ -49,7 +49,7 @@ export const RenderEditCell = ({
             });
 
             setEditedRows({
-                ...rationsData[params.row.id],
+                ...rationsData,
                 [params.colDef.field]: params.value,
             });
         } else {
