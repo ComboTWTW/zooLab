@@ -24,7 +24,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import { useMutation } from "@tanstack/react-query";
-import { NumericEditCell, renderEditCell } from "./NumericEditCell";
+import { RenderEditCell } from "./RenderEditCell";
 
 interface Props {
     rationsData: rationsT;
@@ -49,7 +49,12 @@ const ProductsTable = ({ rationsData }: Props) => {
     /* Rows and RowModel states*/
 
     const [rows, setRows] = useState(rationsData);
+    const [editedRows, setEditedRows] = useState();
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+
+    useEffect(() => {
+        console.log(editedRows);
+    }, [editedRows]);
 
     /* Prevents default start and exit editing behaviour on some actions*/
     const handleRowEditStop: GridEventListener<"rowEditStop"> = (
@@ -245,39 +250,15 @@ const ProductsTable = ({ rationsData }: Props) => {
                     {params.value}
                 </span>
             ),
-            renderEditCell: (params) => {
-                let tempValue = params.value;
-
-                const handleChange = (e: any) => {
-                    tempValue = e.target.value;
-                };
-
-                const handleBlur = () => {
-                    if (tempValue.trim() === "") {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: params.value,
-                        }); // Revert to previous value
-                    } else {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: tempValue,
-                        }); // Save new value
-                    }
-                };
-
-                return (
-                    <textarea
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full max-h-full resize-none px-2"
-                    >
-                        {tempValue}
-                    </textarea>
-                );
-            },
+            renderEditCell: (params) => (
+                <RenderEditCell
+                    params={params}
+                    typeOfField={"text"}
+                    editedRows={editedRows}
+                    setEditedRows={setEditedRows}
+                    rationsData={rationsData}
+                />
+            ),
         },
         {
             field: "composition",
@@ -289,39 +270,15 @@ const ProductsTable = ({ rationsData }: Props) => {
                     {params.value}
                 </span>
             ),
-            renderEditCell: (params) => {
-                let tempValue = params.value;
-
-                const handleChange = (e: any) => {
-                    tempValue = e.target.value;
-                };
-
-                const handleBlur = () => {
-                    if (tempValue.trim() === "") {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: params.value,
-                        }); // Revert to previous value
-                    } else {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: tempValue,
-                        }); // Save new value
-                    }
-                };
-
-                return (
-                    <textarea
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full max-h-full resize-none px-2"
-                    >
-                        {tempValue}
-                    </textarea>
-                );
-            },
+            renderEditCell: (params) => (
+                <RenderEditCell
+                    params={params}
+                    typeOfField={"text"}
+                    editedRows={editedRows}
+                    setEditedRows={setEditedRows}
+                    rationsData={rationsData}
+                />
+            ),
         },
         {
             field: "description",
@@ -333,39 +290,15 @@ const ProductsTable = ({ rationsData }: Props) => {
                     {params.value}
                 </span>
             ),
-            renderEditCell: (params) => {
-                let tempValue = params.value;
-
-                const handleChange = (e: any) => {
-                    tempValue = e.target.value;
-                };
-
-                const handleBlur = () => {
-                    if (tempValue.trim() === "") {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: params.value,
-                        }); // Revert to previous value
-                    } else {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: tempValue,
-                        }); // Save new value
-                    }
-                };
-
-                return (
-                    <textarea
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full max-h-full resize-none px-2"
-                    >
-                        {tempValue}
-                    </textarea>
-                );
-            },
+            renderEditCell: (params) => (
+                <RenderEditCell
+                    params={params}
+                    typeOfField={"text"}
+                    editedRows={editedRows}
+                    setEditedRows={setEditedRows}
+                    rationsData={rationsData}
+                />
+            ),
         },
         {
             field: "weight",
@@ -377,39 +310,15 @@ const ProductsTable = ({ rationsData }: Props) => {
                     {params.value}
                 </span>
             ),
-            renderEditCell: (params) => {
-                let tempValue = params.value;
-
-                const handleChange = (e: any) => {
-                    tempValue = e.target.value;
-                };
-
-                const handleBlur = () => {
-                    if (tempValue.trim() === "") {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: params.value,
-                        }); // Revert to previous value
-                    } else {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: tempValue,
-                        }); // Save new value
-                    }
-                };
-
-                return (
-                    <textarea
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full max-h-full resize-none px-2"
-                    >
-                        {tempValue}
-                    </textarea>
-                );
-            },
+            renderEditCell: (params) => (
+                <RenderEditCell
+                    params={params}
+                    typeOfField={"text"}
+                    editedRows={editedRows}
+                    setEditedRows={setEditedRows}
+                    rationsData={rationsData}
+                />
+            ),
         },
         {
             field: "composition_full",
@@ -421,39 +330,15 @@ const ProductsTable = ({ rationsData }: Props) => {
                     {params.value}
                 </span>
             ),
-            renderEditCell: (params) => {
-                let tempValue = params.value;
-
-                const handleChange = (e: any) => {
-                    tempValue = e.target.value;
-                };
-
-                const handleBlur = () => {
-                    if (tempValue.trim() === "") {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: params.value,
-                        }); // Revert to previous value
-                    } else {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: tempValue,
-                        }); // Save new value
-                    }
-                };
-
-                return (
-                    <textarea
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full max-h-full resize-none px-2"
-                    >
-                        {tempValue}
-                    </textarea>
-                );
-            },
+            renderEditCell: (params) => (
+                <RenderEditCell
+                    params={params}
+                    typeOfField={"text"}
+                    editedRows={editedRows}
+                    setEditedRows={setEditedRows}
+                    rationsData={rationsData}
+                />
+            ),
         },
 
         {
@@ -466,39 +351,15 @@ const ProductsTable = ({ rationsData }: Props) => {
                     {params.value}
                 </span>
             ),
-            renderEditCell: (params) => {
-                let tempValue = params.value;
-
-                const handleChange = (e: any) => {
-                    tempValue = e.target.value;
-                };
-
-                const handleBlur = () => {
-                    if (tempValue.trim() === "") {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: params.value,
-                        }); // Revert to previous value
-                    } else {
-                        params.api.setEditCellValue({
-                            id: params.id,
-                            field: params.field,
-                            value: tempValue,
-                        }); // Save new value
-                    }
-                };
-
-                return (
-                    <textarea
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className="w-full max-h-full resize-none px-2"
-                    >
-                        {tempValue}
-                    </textarea>
-                );
-            },
+            renderEditCell: (params) => (
+                <RenderEditCell
+                    params={params}
+                    typeOfField={"text"}
+                    editedRows={editedRows}
+                    setEditedRows={setEditedRows}
+                    rationsData={rationsData}
+                />
+            ),
         },
         {
             field: "price",
@@ -510,7 +371,15 @@ const ProductsTable = ({ rationsData }: Props) => {
                     {params.value}
                 </span>
             ),
-            renderEditCell: (params) => <NumericEditCell params={params} />,
+            renderEditCell: (params) => (
+                <RenderEditCell
+                    params={params}
+                    typeOfField={"number"}
+                    editedRows={editedRows}
+                    setEditedRows={setEditedRows}
+                    rationsData={rationsData}
+                />
+            ),
         },
         {
             field: "created_at",
