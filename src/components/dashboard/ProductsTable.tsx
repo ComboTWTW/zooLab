@@ -144,26 +144,29 @@ const ProductsTable = ({ rationsData }: Props) => {
     /* Edit button was clicked */
     const [editCnt, setEditCnt] = useState<number>(0);
     const handleEditClick = (row: any, id: GridRowId) => () => {
-        setEditedRows(rationsData[+id]);
         console.log(editCnt);
         const handleEdit = () => {
             setRowModesModel((oldModel) => ({
                 ...oldModel,
                 [id]: { mode: GridRowModes.Edit },
             }));
+            setEditedRows(rationsData[+id]);
             setEditCnt((editCnt) => ++editCnt);
         };
-        editCnt < 1 && handleEdit();
+        editCnt === 0 && handleEdit();
     };
+
+    /* Confirmation windows if Save button was clicked */
+    const [openSaveEditDialog, setOpenSaveEditDialog] = useState(false);
 
     /* Save button was clicked */
 
     const handleSaveClick = (row: any, id: GridRowId) => () => {
-        setEditCnt((editCnt) => --editCnt);
-        setRowModesModel((oldModel) => ({
-            ...oldModel,
-            [id]: { mode: GridRowModes.View },
-        }));
+        if (editedRows !== rationsData[+id]) {
+            setOpenSaveEditDialog(true);
+        }
+
+        setSelectedRowId(id);
     };
 
     /* Cancel-edit button was clicked */
@@ -532,6 +535,30 @@ const ProductsTable = ({ rationsData }: Props) => {
                 <DialogActions>
                     <Button onClick={handleCloseSuccessDialog} autoFocus>
                         OK
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* CONFORMATION DIALOG EDIT */}
+            <Dialog
+                open={openSaveEditDialog}
+                onClose={handleCancelClick}
+                maxWidth="xs"
+                fullWidth
+            >
+                <DialogTitle>Подтвердить редактирование</DialogTitle>
+                <DialogContent>
+                    <p>
+                        Вы уверены, что хотите изменить рацион с id=
+                        {selectedRowId}
+                    </p>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenSaveEditDialog(false)}>
+                        Cancel
+                    </Button>
+                    <Button onClick={() => handleConfirmDelete()} color="error">
+                        Delete
                     </Button>
                 </DialogActions>
             </Dialog>
