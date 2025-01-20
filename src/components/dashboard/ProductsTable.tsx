@@ -51,11 +51,27 @@ const ProductsTable = ({ rationsData }: Props) => {
     const [rows, setRows] = useState(rationsData);
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
 
+    /* Prevents default start and exit editing behaviour on some actions*/
+    const handleRowEditStop: GridEventListener<"rowEditStop"> = (
+        params,
+        event
+    ) => {
+        event.defaultMuiPrevented = true;
+    };
+
+    const handleRowEditStart: GridEventListener<"rowEditStart"> = (
+        params,
+        event
+    ) => {
+        event.defaultMuiPrevented = true;
+    };
+
     /* ------------------------------------------------------------------------------------------------------------------------------ */
     /* DELETE RATION HANDLING */
 
     /* If delete buttom was clicked */
 
+    const [selectedRowId, setSelectedRowId] = useState<GridRowId | null>(null);
     const handleDeleteClick = (id: GridRowId) => () => {
         setSelectedRowId(id); // Store the id of the row to be deleted
         setOpenDialog(true); // Open the confirmation dialog (are you sure you want to delete)
@@ -63,7 +79,6 @@ const ProductsTable = ({ rationsData }: Props) => {
 
     /* Conformation window if Delete button was clicked  */
     const [openDialog, setOpenDialog] = useState(false);
-    const [selectedRowId, setSelectedRowId] = useState<GridRowId | null>(null);
 
     /* If in delete dialog window "cancel" button was clicked  */
     const handleCancelDelete = () => {
@@ -111,46 +126,56 @@ const ProductsTable = ({ rationsData }: Props) => {
         string | null
     >(null);
 
-    /* ------------------------------------------------------------------------------------------------------------------------------ */
-    /* EDIT RATION HANDLING */
-
-    const handleEditClick = (id: GridRowId) => () => {
-        setRowModesModel((oldModel) => ({
-            ...oldModel,
-            [id]: { mode: GridRowModes.Edit },
-        }));
+    // Reset success delete message on close succ windows
+    const handleCloseSuccessDialog = () => {
+        setSuccessDeleteMessage(null);
     };
 
-    const handleSaveClick = (id: GridRowId) => () => {
+    /* EDIT RATION HANDLING */
+
+    /* Edit button was clicked */
+    const [editCnt, setEditCnt] = useState<number>(0);
+    const handleEditClick = (row: any, id: GridRowId) => () => {
+        console.log(editCnt);
+        const handleEdit = () => {
+            setRowModesModel((oldModel) => ({
+                ...oldModel,
+                [id]: { mode: GridRowModes.Edit },
+            }));
+            setEditCnt((editCnt) => ++editCnt);
+        };
+        editCnt < 1 && handleEdit();
+    };
+
+    /* Save button was clicked */
+
+    const handleSaveClick = (row: any, id: GridRowId) => () => {
+        setEditCnt((editCnt) => --editCnt);
         setRowModesModel((oldModel) => ({
             ...oldModel,
             [id]: { mode: GridRowModes.View },
         }));
     };
 
-    /* DELTE CONFORMATION DIALOG  ------------------------*/
-
+    /* Cancel-edit button was clicked */
     const handleCancelClick = (id: GridRowId) => () => {
-        setRowModesModel((oldModel) => ({
-            ...oldModel,
-            [id]: { mode: GridRowModes.View, ignoreModifications: true },
-        }));
+        const handleEdit = () => {
+            setRowModesModel((oldModel) => ({
+                ...oldModel,
+                [id]: { mode: GridRowModes.View, ignoreModifications: true },
+            }));
+            setEditCnt((editCnt) => --editCnt);
+        };
+        editCnt === 1 && handleEdit();
     };
 
-    const handleCloseSuccessDialog = () => {
-        setSuccessDeleteMessage(null); // Reset success message on close
-    };
-
-    /* ACTIONS LOGIC END--------------------------------------- */
-
-    /* TABLE SET-UP------------------------------------------------ */
-
-    const processRowUpdate = (newRow: any) => {
+    /* Updates  rows state before updating table */
+    const processRowUpdate = (newRow: any, oldRow: any, params: any) => {
         const updatedRow = { ...newRow, isNew: false };
         setRows((oldRows) =>
             oldRows.map((row) => (row.id === newRow.id ? updatedRow : row))
         );
-        console.log("save");
+
         return updatedRow;
     };
 
@@ -499,7 +524,7 @@ const ProductsTable = ({ rationsData }: Props) => {
             headerName: "Действия",
             width: 100,
             /* ACTION BUTTONS ---------------- */
-            getActions: ({ id }) => {
+            getActions: ({ id, row }) => {
                 const isInEditMode =
                     rowModesModel[id]?.mode === GridRowModes.Edit;
                 if (isInEditMode) {
@@ -508,7 +533,7 @@ const ProductsTable = ({ rationsData }: Props) => {
                         <GridActionsCellItem
                             icon={<SaveIcon />}
                             label="Save"
-                            onClick={handleSaveClick(id)}
+                            onClick={handleSaveClick(row, id)}
                         />,
                         /* Cancel Changes */
                         <GridActionsCellItem
@@ -523,7 +548,7 @@ const ProductsTable = ({ rationsData }: Props) => {
                     <GridActionsCellItem
                         icon={<EditIcon />}
                         label="Edit"
-                        onClick={handleEditClick(id)}
+                        onClick={handleEditClick(row, id)}
                     />,
                     /* Delete button */
                     <GridActionsCellItem
@@ -536,12 +561,11 @@ const ProductsTable = ({ rationsData }: Props) => {
         },
     ];
 
-    /* TABLE SET-UP END --------------------------------------- */
-
-    /* --------------------------------------- */
     return (
         <Box sx={{ maxWidth: "100%", maxHeight: "100%" }}>
             <DataGrid
+                onRowEditStop={handleRowEditStop}
+                onRowEditStart={handleRowEditStart}
                 rows={rows}
                 columns={columns}
                 editMode="row"
