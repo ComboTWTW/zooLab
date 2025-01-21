@@ -1,13 +1,10 @@
-import * as React from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import {
     DataGrid,
     GridColDef,
@@ -19,18 +16,14 @@ import {
 } from "@mui/x-data-grid";
 import { useState, useEffect } from "react";
 import { rationsT } from "../../../api/getRation";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
 import { useMutation } from "@tanstack/react-query";
 import { RenderEditCell } from "./RenderEditCell";
 import DragAndDropImage from "./DragAndDropImage";
-import { rations } from "../../../constants";
 import ConfirmationDialogDelete from "./PopUps/ConfirmationDialogDelete/ConfirmationDialogDelete";
 import SuccsessDeleteDialog from "./PopUps/ConfirmationDialogDelete/SuccsessDeleteDialog";
 import ConfirmationDialogEdit from "./PopUps/ConfirmationDialogDelete/ConfirmationDialogEdit";
 import SuccsessEditDialog from "./PopUps/ConfirmationDialogDelete/SuccsessEditDialog";
+import { error } from "console";
 
 interface Props {
     rationsData: rationsT;
@@ -66,14 +59,22 @@ const ProductsTable = ({ rationsData }: Props) => {
 
     /* Rows and RowModel states*/
 
-    const [rows, setRows] = useState(rationsData);
-    const [editedRows, setEditedRows] = useState<any>({});
-    const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
+    type editedRowT =
+        | (Omit<rationsT[0], "image" | "image_big"> & {
+              newImages?: ["image"] | ["image_big"] | ["image", "image_big"];
+              image:
+                  | string
+                  | [file: File, folder: string, originalImagePath: string];
+              image_big:
+                  | string
+                  | [file: File, folder: string, originalImagePath: string];
+          })
+        | null
+        | undefined;
 
-    useEffect(() => {
-        console.log("edited rows");
-        console.log(editedRows);
-    }, [editedRows]);
+    const [rows, setRows] = useState(rationsData);
+    const [editedRows, setEditedRows] = useState<editedRowT>(null);
+    const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
 
     /* Prevents default start and exit editing behaviour on some actions*/
     const handleRowEditStop: GridEventListener<"rowEditStop"> = (
@@ -224,18 +225,9 @@ const ProductsTable = ({ rationsData }: Props) => {
 
     /* React-query SEND EDITED DATA TO DB */
     const mutationUpdateRation = useMutation({
-        mutationFn: async (mutationPayload: {
-            id: number;
-            title: string;
-            image: string;
-            image_big: string;
-            composition: string;
-            description: string;
-            weight: string;
-            price: number;
-            composition_full: string;
-            nutrition_value: string;
-        }) => {
+        mutationFn: async (
+            mutationPayload: Omit<rationsT[0], "created_at">
+        ) => {
             const response = await fetch("/api/update_ration", {
                 method: "POST",
                 headers: {
@@ -251,7 +243,7 @@ const ProductsTable = ({ rationsData }: Props) => {
 
             return response.json(); // Return the successful response data
         },
-        onSuccess: () => {
+        onSuccess: (selectedRowId: GridRowId) => {
             setSuccesEditedMessage(
                 `Рацион с id=${selectedRowId} был успешно отредактирован`
             );
@@ -287,47 +279,113 @@ const ProductsTable = ({ rationsData }: Props) => {
             }
         };
 
-        const uploadImagesAndPrepareData = async () => {
-            const updatedRows = { ...editedRows }; // Create a copy to ensure immutability
+        const uploadImagesAndPrepareData = async (): Promise<
+            Omit<rationsT[0], "deleted" | "created_at">
+        > => {
+            if (
+                editedRows !== undefined &&
+                editedRows !== null &&
+                editedRows.newImages !== undefined
+            ) {
+                const updatedRows: editedRowT = { ...editedRows }; // Create a copy to ensure immutability
+                if (Array.isArray(editedRows.newImages)) {
+                    for (const element of editedRows.newImages) {
+                        const imageField = editedRows[element];
 
-            if (editedRows.newImages !== undefined) {
-                for (const element of editedRows.newImages) {
-                    try {
-                        const imageUrl = await handleUploadImage(
-                            editedRows[element].file,
-                            editedRows[element].folder,
-                            editedRows[element].originalImagePath
-                        );
-                        updatedRows[element] = imageUrl; // Update the URL
-                    } catch (error) {
-                        console.error(`Failed to upload ${element}:`, error);
-                        throw error;
+                        // Type guard for `{ file: File, folder: string, originalImagePath: string }`
+                        const isImageField = (
+                            field: unknown
+                        ): field is {
+                            file: File;
+                            folder: string;
+                            originalImagePath: string;
+                        } => {
+                            return (
+                                field !== null &&
+                                typeof field === "object" &&
+                                "file" in field &&
+                                "folder" in field &&
+                                "originalImagePath" in field &&
+                                field.file instanceof File &&
+                                typeof field.folder === "string" &&
+                                typeof field.originalImagePath === "string"
+                            );
+                        };
+
+                        if (isImageField(imageField)) {
+                            try {
+                                const { file, folder, originalImagePath } =
+                                    imageField;
+                                const imageUrl = await handleUploadImage(
+                                    file,
+                                    folder,
+                                    originalImagePath
+                                );
+                                updatedRows[element] = imageUrl; // Update the IMAGE URL
+                            } catch (error) {
+                                console.error(
+                                    `Failed to upload ${element}:`,
+                                    error
+                                );
+                                throw error;
+                            }
+                        } else {
+                            console.error(
+                                `Invalid imageField format for ${element}:`,
+                                imageField
+                            );
+                        }
                     }
                 }
 
                 // Remove `newImages` after processing
                 delete updatedRows.newImages;
-            }
 
-            return updatedRows;
+                // Ensure `image` and `image_big` are strings
+                if (
+                    typeof updatedRows.image === "string" &&
+                    typeof updatedRows.image_big === "string"
+                ) {
+                    // Return only the necessary fields for rationsT[0]
+                    const result: Omit<rationsT[0], "deleted" | "created_at"> =
+                        {
+                            id: updatedRows.id,
+                            title: updatedRows.title,
+                            image: updatedRows.image,
+                            image_big: updatedRows.image_big,
+                            composition: updatedRows.composition,
+                            description: updatedRows.description,
+                            weight: updatedRows.weight,
+                            price: updatedRows.price,
+                            composition_full: updatedRows.composition_full,
+                            nutrition_value: updatedRows.nutrition_value,
+                        };
+                    return result;
+                }
+            }
+            console.log(editedRows);
+            throw new Error(
+                "Invalid data: Unable to process images or prepare data"
+            );
         };
 
         try {
             const finalData = await uploadImagesAndPrepareData();
 
             // Extract the required fields for the mutation
-            const mutationPayload = {
-                id: finalData.id,
-                title: finalData.title,
-                image: finalData.image,
-                image_big: finalData.image_big,
-                composition: finalData.composition,
-                description: finalData.description,
-                weight: finalData.weight,
-                price: finalData.price,
-                composition_full: finalData.composition_full,
-                nutrition_value: finalData.nutrition_value,
-            };
+            const mutationPayload: Omit<rationsT[0], "deleted" | "created_at"> =
+                {
+                    id: finalData.id,
+                    title: finalData.title,
+                    image: finalData.image,
+                    image_big: finalData.image_big,
+                    composition: finalData.composition,
+                    description: finalData.description,
+                    weight: finalData.weight,
+                    price: finalData.price,
+                    composition_full: finalData.composition_full,
+                    nutrition_value: finalData.nutrition_value,
+                };
 
             await mutationUpdateRation.mutateAsync(mutationPayload);
 
