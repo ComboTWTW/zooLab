@@ -6,7 +6,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import QuizIcon from "@mui/icons-material/Quiz";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import LogoutIcon from "@mui/icons-material/Logout";
-import Products from "../components/dashboard/Products";
+import Products from "../components/dashboard/Products/Products";
 
 interface DecodedToken {
     id: number;

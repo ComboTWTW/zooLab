@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { fetchRations } from "../../api/getRation";
-import { rationsT } from "../../api/getRation";
+import { fetchRations } from "../../../api/getRation";
+import { rationsT } from "../../../api/getRation";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";

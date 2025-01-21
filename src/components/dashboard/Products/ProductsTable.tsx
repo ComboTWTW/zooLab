@@ -18,7 +18,7 @@ import {
     GridEventListener,
 } from "@mui/x-data-grid";
 import { useState, useEffect } from "react";
-import { rationsT } from "../../api/getRation";
+import { rationsT } from "../../../api/getRation";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -26,7 +26,11 @@ import DialogActions from "@mui/material/DialogActions";
 import { useMutation } from "@tanstack/react-query";
 import { RenderEditCell } from "./RenderEditCell";
 import DragAndDropImage from "./DragAndDropImage";
-import { rations } from "../../constants";
+import { rations } from "../../../constants";
+import ConfirmationDialogDelete from "./PopUps/ConfirmationDialogDelete/ConfirmationDialogDelete";
+import SuccsessDeleteDialog from "./PopUps/ConfirmationDialogDelete/SuccsessDeleteDialog";
+import ConfirmationDialogEdit from "./PopUps/ConfirmationDialogDelete/ConfirmationDialogEdit";
+import SuccsessEditDialog from "./PopUps/ConfirmationDialogDelete/SuccsessEditDialog";
 
 interface Props {
     rationsData: rationsT;
@@ -185,7 +189,7 @@ const ProductsTable = ({ rationsData }: Props) => {
     };
 
     /* Cancel-edit button was clicked */
-    const handleCancelClick = (id: GridRowId) => () => {
+    const handleCancelEditClick = (id: GridRowId) => () => {
         const handleEdit = () => {
             setRowModesModel((oldModel) => ({
                 ...oldModel,
@@ -615,7 +619,7 @@ const ProductsTable = ({ rationsData }: Props) => {
                         <GridActionsCellItem
                             icon={<CancelIcon />}
                             label="Cancel"
-                            onClick={handleCancelClick(id)}
+                            onClick={handleCancelEditClick(id)}
                         />,
                     ];
                 }
@@ -672,89 +676,34 @@ const ProductsTable = ({ rationsData }: Props) => {
             />
 
             {/* CONFORMATION DIALOG DELETE */}
-            <Dialog
-                open={openDialog}
-                onClose={handleCancelDelete}
-                maxWidth="xs"
-                fullWidth
-            >
-                <DialogTitle>Подтвердить удаление</DialogTitle>
-                <DialogContent>
-                    <p>
-                        Вы уверены, что хотите поместить в корзину рацион с id=
-                        {selectedRowId}
-                    </p>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCancelDelete}>Cancel</Button>
-                    <Button onClick={() => handleConfirmDelete()} color="error">
-                        Delete
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <ConfirmationDialogDelete
+                handleCancelDelete={handleCancelDelete}
+                handleConfirmDelete={handleConfirmDelete}
+                openDialog={openDialog}
+                selectedRowId={selectedRowId}
+            />
 
             {/* Successful deleting dialog*/}
-            <Dialog
-                open={!!succesEditedMessage}
-                onClose={handleCloseSuccessDialog}
-                maxWidth="xs"
-                fullWidth
-            >
-                <DialogTitle>Успех</DialogTitle>
-                <DialogContent dividers>
-                    <p>{successDeleteMessage}</p>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseSuccessDialog} autoFocus>
-                        OK
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <SuccsessDeleteDialog
+                handleCloseSuccessDialog={handleCloseSuccessDialog}
+                successDeleteMessage={succesEditedMessage}
+            />
 
             {/* CONFORMATION DIALOG EDIT */}
-            <Dialog
-                open={openSaveEditDialog}
-                onClose={handleCancelClick}
-                maxWidth="xs"
-                fullWidth
-            >
-                <DialogTitle>Подтвердить редактирование</DialogTitle>
-                <DialogContent>
-                    <p>
-                        Вы уверены, что хотите изменить рацион с id=
-                        {selectedRowId}
-                    </p>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => handleConfirmEdit()} color="primary">
-                        Edit
-                    </Button>
-                    <Button
-                        color="error"
-                        onClick={() => setOpenSaveEditDialog(false)}
-                    >
-                        Cancel
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <ConfirmationDialogEdit
+                handleCancelEditClick={handleCancelEditClick}
+                handleConfirmEdit={handleConfirmEdit}
+                openSaveEditDialog={openSaveEditDialog}
+                selectedRowId={selectedRowId}
+                setOpenSaveEditDialog={setOpenSaveEditDialog}
+            />
 
             {/* Successful editing dialog*/}
-            <Dialog
-                open={!!succesEditedMessage}
-                onClose={() => setSuccesEditedMessage(null)}
-                maxWidth="xs"
-                fullWidth
-            >
-                <DialogTitle>Успех</DialogTitle>
-                <DialogContent dividers>
-                    <p>{succesEditedMessage}</p>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseSuccessEditDialog} autoFocus>
-                        OK
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <SuccsessEditDialog
+                handleCloseSuccessEditDialog={handleCloseSuccessEditDialog}
+                setSuccesEditedMessage={setSuccesEditedMessage}
+                succesEditedMessage={succesEditedMessage}
+            />
         </Box>
     );
 };
