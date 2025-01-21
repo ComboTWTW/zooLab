@@ -9,6 +9,8 @@ import calcRationPost from './routes/calcRationPost.js';
 import placeOrder from './routes/placeOrder.js';
 import auth from './routes/auth.js';
 import deleteRation from './routes/dashborad/deleteRation.js';
+import uploadImage from './routes/dashborad/uploadImage.js';
+import updateRation from './routes/dashborad/updateRation.js';
 
 
 dotenv.config(); 
@@ -44,6 +46,9 @@ app.use('/api', calcRationPost(connection));
 app.use('/api', placeOrder(connection));
 app.use('/api', auth(connection));
 app.use('/api', deleteRation(connection));
+app.use('/api', uploadImage(connection));
+app.use('/api', updateRation(connection));
+
 
 
 // Start the server

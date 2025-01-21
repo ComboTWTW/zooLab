@@ -28,11 +28,22 @@ const DragAndDropImage = ({
         onDrop: (acceptedFiles) => {
             if (acceptedFiles.length > 0) {
                 const file = acceptedFiles[0];
+                const folder = params.formattedValue.split("/")[2];
+                const originalImagePath = params.formattedValue;
+
                 setPreview(URL.createObjectURL(file)); // Show the preview of the uploaded image
                 handleImageChange(file);
+                console.log(params);
                 setEditedRows({
                     ...editedRows,
-                    [params.colDef.field]: file,
+                    [params.colDef.field]: {
+                        file: file,
+                        folder: folder,
+                        originalImagePath: originalImagePath,
+                    },
+                    newImages: editedRows?.hasOwnProperty("newImages")
+                        ? [...editedRows?.newImages, params.colDef.field]
+                        : [params.colDef.field],
                 });
             }
         },

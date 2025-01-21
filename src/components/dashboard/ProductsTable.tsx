@@ -38,7 +38,10 @@ const ProductsTable = ({ rationsData }: Props) => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [page, setPage] = useState(parseInt(searchParams.get("p") || "1"));
 
-    const handlePageChange = (newPage: number) => {
+    const handlePageChange = (
+        newPage: number,
+        selectedRowId: GridRowId | null
+    ) => {
         console.log(newPage);
         setSearchParams((prev) => {
             prev.set("menu", "products"); // Ensure menu=products is always present
@@ -46,12 +49,21 @@ const ProductsTable = ({ rationsData }: Props) => {
 
             return prev;
         });
+        selectedRowId !== null &&
+            setRowModesModel((oldModel) => ({
+                ...oldModel,
+                [selectedRowId]: {
+                    mode: GridRowModes.View,
+                    ignoreModifications: true,
+                },
+            }));
+        setEditCnt(0);
     };
 
     /* Rows and RowModel states*/
 
     const [rows, setRows] = useState(rationsData);
-    const [editedRows, setEditedRows] = useState({});
+    const [editedRows, setEditedRows] = useState<any>({});
     const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
 
     useEffect(() => {
@@ -145,12 +157,15 @@ const ProductsTable = ({ rationsData }: Props) => {
     const [editCnt, setEditCnt] = useState<number>(0);
     const handleEditClick = (row: any, id: GridRowId) => () => {
         console.log(editCnt);
+        setSelectedRowId(id);
         const handleEdit = () => {
             setRowModesModel((oldModel) => ({
                 ...oldModel,
                 [id]: { mode: GridRowModes.Edit },
             }));
-            setEditedRows(rationsData[+id]);
+            console.log("id " + id);
+            setEditedRows(rationsData.find((item) => item.id === id));
+
             setEditCnt((editCnt) => ++editCnt);
         };
         editCnt === 0 && handleEdit();
@@ -179,6 +194,161 @@ const ProductsTable = ({ rationsData }: Props) => {
             setEditCnt((editCnt) => --editCnt);
         };
         editCnt === 1 && handleEdit();
+    };
+
+    /* React-query Upload Image */
+    const mutationUploadImage = useMutation({
+        mutationFn: async (formData: FormData) => {
+            const response = await fetch("/api/upload_image", {
+                method: "POST",
+                body: formData, // Sending FormData directly
+            });
+
+            if (!response.ok) {
+                throw new Error("failed to upload");
+            }
+
+            return response.json();
+        },
+        onSuccess: (data) => {
+            console.log("Image was uploaded successfully:", data.imageUrl);
+        },
+        onError: (error: any) => {
+            alert(error.message);
+        },
+    });
+
+    /* React-query SEND EDITED DATA TO DB */
+    const mutationUpdateRation = useMutation({
+        mutationFn: async (mutationPayload: {
+            id: number;
+            title: string;
+            image: string;
+            image_big: string;
+            composition: string;
+            description: string;
+            weight: string;
+            price: number;
+            composition_full: string;
+            nutrition_value: string;
+        }) => {
+            const response = await fetch("/api/update_ration", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(mutationPayload),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Failed to update ration");
+            }
+
+            return response.json(); // Return the successful response data
+        },
+        onSuccess: () => {
+            setSuccesEditedMessage(
+                `Рацион с id=${selectedRowId} был успешно отредактирован`
+            );
+        },
+        onError: (error) => {
+            alert(error.message);
+        },
+    });
+
+    /* If in edit dialog windows "edit" button was clicked  */
+    const handleConfirmEdit = async () => {
+        if (selectedRowId === null) return; // Check if editing was made
+
+        const handleUploadImage = async (
+            file: File,
+            folder: string,
+            originalImagePath?: string
+        ) => {
+            const formData = new FormData();
+            formData.append("image", file);
+            formData.append("folder", folder);
+            if (originalImagePath) {
+                formData.append("originalImagePath", `${originalImagePath}`);
+            }
+            try {
+                const response = await mutationUploadImage.mutateAsync(
+                    formData
+                );
+                return response.imageUrl; // Return the uploaded image path from the server response
+            } catch (error) {
+                console.error("Image upload failed:", error);
+                throw error;
+            }
+        };
+
+        const uploadImagesAndPrepareData = async () => {
+            const updatedRows = { ...editedRows }; // Create a copy to ensure immutability
+
+            if (editedRows.newImages !== undefined) {
+                for (const element of editedRows.newImages) {
+                    try {
+                        const imageUrl = await handleUploadImage(
+                            editedRows[element].file,
+                            editedRows[element].folder,
+                            editedRows[element].originalImagePath
+                        );
+                        updatedRows[element] = imageUrl; // Update the URL
+                    } catch (error) {
+                        console.error(`Failed to upload ${element}:`, error);
+                        throw error;
+                    }
+                }
+
+                // Remove `newImages` after processing
+                delete updatedRows.newImages;
+            }
+
+            return updatedRows;
+        };
+
+        try {
+            const finalData = await uploadImagesAndPrepareData();
+
+            // Extract the required fields for the mutation
+            const mutationPayload = {
+                id: finalData.id,
+                title: finalData.title,
+                image: finalData.image,
+                image_big: finalData.image_big,
+                composition: finalData.composition,
+                description: finalData.description,
+                weight: finalData.weight,
+                price: finalData.price,
+                composition_full: finalData.composition_full,
+                nutrition_value: finalData.nutrition_value,
+            };
+
+            await mutationUpdateRation.mutateAsync(mutationPayload);
+
+            setOpenSaveEditDialog(false); // Close the dialog
+        } catch (error) {
+            console.error("Error during update process:", error);
+        }
+
+        setRowModesModel((oldModel) => ({
+            ...oldModel,
+            [selectedRowId]: {
+                mode: GridRowModes.View,
+            },
+        }));
+    };
+
+    /* Message state if editing was succsefflul */
+    const [succesEditedMessage, setSuccesEditedMessage] = useState<
+        string | null
+    >(null);
+
+    // Reset success edit message on close succ windows
+    const handleCloseSuccessEditDialog = () => {
+        setEditCnt(0);
+        setSuccesEditedMessage(null);
     };
 
     /* Updates  rows state before updating table */
@@ -480,7 +650,9 @@ const ProductsTable = ({ rationsData }: Props) => {
                 processRowUpdate={processRowUpdate}
                 rowHeight={200}
                 pagination // Enable pagination
-                onPaginationModelChange={(e) => handlePageChange(e.page)}
+                onPaginationModelChange={(e) =>
+                    handlePageChange(e.page, selectedRowId)
+                }
                 initialState={{
                     pagination: {
                         paginationModel: { pageSize: 5, page: page - 1 }, // Set rows per page to 5
@@ -523,7 +695,7 @@ const ProductsTable = ({ rationsData }: Props) => {
 
             {/* Successful deleting dialog*/}
             <Dialog
-                open={!!successDeleteMessage}
+                open={!!succesEditedMessage}
                 onClose={handleCloseSuccessDialog}
                 maxWidth="xs"
                 fullWidth
@@ -554,11 +726,32 @@ const ProductsTable = ({ rationsData }: Props) => {
                     </p>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpenSaveEditDialog(false)}>
+                    <Button onClick={() => handleConfirmEdit()} color="primary">
+                        Edit
+                    </Button>
+                    <Button
+                        color="error"
+                        onClick={() => setOpenSaveEditDialog(false)}
+                    >
                         Cancel
                     </Button>
-                    <Button onClick={() => handleConfirmDelete()} color="error">
-                        Delete
+                </DialogActions>
+            </Dialog>
+
+            {/* Successful editing dialog*/}
+            <Dialog
+                open={!!succesEditedMessage}
+                onClose={() => setSuccesEditedMessage(null)}
+                maxWidth="xs"
+                fullWidth
+            >
+                <DialogTitle>Успех</DialogTitle>
+                <DialogContent dividers>
+                    <p>{succesEditedMessage}</p>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseSuccessEditDialog} autoFocus>
+                        OK
                     </Button>
                 </DialogActions>
             </Dialog>
