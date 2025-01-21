@@ -243,7 +243,7 @@ const ProductsTable = ({ rationsData }: Props) => {
 
             return response.json(); // Return the successful response data
         },
-        onSuccess: (selectedRowId: GridRowId) => {
+        onSuccess: () => {
             setSuccesEditedMessage(
                 `Рацион с id=${selectedRowId} был успешно отредактирован`
             );
@@ -282,73 +282,72 @@ const ProductsTable = ({ rationsData }: Props) => {
         const uploadImagesAndPrepareData = async (): Promise<
             Omit<rationsT[0], "deleted" | "created_at">
         > => {
-            if (
-                editedRows !== undefined &&
-                editedRows !== null &&
-                editedRows.newImages !== undefined
-            ) {
-                const updatedRows: editedRowT = { ...editedRows }; // Create a copy to ensure immutability
-                if (Array.isArray(editedRows.newImages)) {
-                    for (const element of editedRows.newImages) {
-                        const imageField = editedRows[element];
+            if (editedRows !== undefined && editedRows !== null) {
+                if (editedRows.newImages !== undefined) {
+                    const updatedRows: editedRowT = { ...editedRows }; // Create a copy to ensure immutability
+                    if (Array.isArray(editedRows.newImages)) {
+                        for (const element of editedRows.newImages) {
+                            const imageField = editedRows[element];
 
-                        // Type guard for `{ file: File, folder: string, originalImagePath: string }`
-                        const isImageField = (
-                            field: unknown
-                        ): field is {
-                            file: File;
-                            folder: string;
-                            originalImagePath: string;
-                        } => {
-                            return (
-                                field !== null &&
-                                typeof field === "object" &&
-                                "file" in field &&
-                                "folder" in field &&
-                                "originalImagePath" in field &&
-                                field.file instanceof File &&
-                                typeof field.folder === "string" &&
-                                typeof field.originalImagePath === "string"
-                            );
-                        };
-
-                        if (isImageField(imageField)) {
-                            try {
-                                const { file, folder, originalImagePath } =
-                                    imageField;
-                                const imageUrl = await handleUploadImage(
-                                    file,
-                                    folder,
-                                    originalImagePath
+                            // Type guard for `{ file: File, folder: string, originalImagePath: string }`
+                            const isImageField = (
+                                field: unknown
+                            ): field is {
+                                file: File;
+                                folder: string;
+                                originalImagePath: string;
+                            } => {
+                                return (
+                                    field !== null &&
+                                    typeof field === "object" &&
+                                    "file" in field &&
+                                    "folder" in field &&
+                                    "originalImagePath" in field &&
+                                    field.file instanceof File &&
+                                    typeof field.folder === "string" &&
+                                    typeof field.originalImagePath === "string"
                                 );
-                                updatedRows[element] = imageUrl; // Update the IMAGE URL
-                            } catch (error) {
+                            };
+
+                            if (isImageField(imageField)) {
+                                try {
+                                    const { file, folder, originalImagePath } =
+                                        imageField;
+                                    const imageUrl = await handleUploadImage(
+                                        file,
+                                        folder,
+                                        originalImagePath
+                                    );
+                                    updatedRows[element] = imageUrl; // Update the IMAGE URL
+                                } catch (error) {
+                                    console.error(
+                                        `Failed to upload ${element}:`,
+                                        error
+                                    );
+                                    throw error;
+                                }
+                            } else {
                                 console.error(
-                                    `Failed to upload ${element}:`,
-                                    error
+                                    `Invalid imageField format for ${element}:`,
+                                    imageField
                                 );
-                                throw error;
                             }
-                        } else {
-                            console.error(
-                                `Invalid imageField format for ${element}:`,
-                                imageField
-                            );
                         }
                     }
-                }
 
-                // Remove `newImages` after processing
-                delete updatedRows.newImages;
+                    // Remove `newImages` after processing
+                    delete updatedRows.newImages;
 
-                // Ensure `image` and `image_big` are strings
-                if (
-                    typeof updatedRows.image === "string" &&
-                    typeof updatedRows.image_big === "string"
-                ) {
-                    // Return only the necessary fields for rationsT[0]
-                    const result: Omit<rationsT[0], "deleted" | "created_at"> =
-                        {
+                    // Ensure `image` and `image_big` are strings
+                    if (
+                        typeof updatedRows.image === "string" &&
+                        typeof updatedRows.image_big === "string"
+                    ) {
+                        // Return only the necessary fields for rationsT[0]
+                        const result: Omit<
+                            rationsT[0],
+                            "deleted" | "created_at"
+                        > = {
                             id: updatedRows.id,
                             title: updatedRows.title,
                             image: updatedRows.image,
@@ -360,9 +359,37 @@ const ProductsTable = ({ rationsData }: Props) => {
                             composition_full: updatedRows.composition_full,
                             nutrition_value: updatedRows.nutrition_value,
                         };
-                    return result;
+                        return result;
+                    }
+                } else {
+                    if (
+                        typeof editedRows.image === "string" &&
+                        typeof editedRows.image_big === "string"
+                    ) {
+                        const result: Omit<
+                            rationsT[0],
+                            "deleted" | "created_at"
+                        > = {
+                            id: editedRows.id,
+                            title: editedRows.title,
+                            image: editedRows.image,
+                            image_big: editedRows.image_big,
+                            composition: editedRows.composition,
+                            description: editedRows.description,
+                            weight: editedRows.weight,
+                            price: editedRows.price,
+                            composition_full: editedRows.composition_full,
+                            nutrition_value: editedRows.nutrition_value,
+                        };
+                        return result;
+                    } else {
+                        throw new Error(
+                            "Invalid types for image or image_big. Expected strings."
+                        );
+                    }
                 }
             }
+
             console.log(editedRows);
             throw new Error(
                 "Invalid data: Unable to process images or prepare data"

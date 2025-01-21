@@ -25,27 +25,24 @@ const uploadImage = () => {
 
             // Extract the base name and extension of the original file
             const fileName = path.basename(originalImagePath, path.extname(originalImagePath));
-            const newFileExtension = path.extname(req.file.originalname);
+            const fileExtension = path.extname(req.file.originalname);
+
+            // Generate a unique file name
+            const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+            const newFileName = `${fileName}-${uniqueSuffix}${fileExtension}`;
 
             // Build the final destination folder path
             const uploadPath = path.join('public/assets', folder);
-            const finalFilePath = path.join(uploadPath, `${fileName}${newFileExtension}`);
+            const finalFilePath = path.join(uploadPath, newFileName);
 
             // Ensure the destination folder exists
             fs.mkdirSync(uploadPath, { recursive: true });
 
-            // Check if the file already exists with the original name (same base name, different extension)
-            const oldFilePath = path.join(uploadPath, `${fileName}${path.extname(originalImagePath)}`);
-            if (fs.existsSync(oldFilePath)) {
-                // If it exists, remove the old file regardless of the extension
-                fs.unlinkSync(oldFilePath);
-            }
-
-            // Move the new file from the temporary folder to the final destination
+            // Move the file from the temporary folder to the final destination
             fs.renameSync(req.file.path, finalFilePath);
 
             // Construct the relative URL for the uploaded file
-            const imageUrl = `/assets/${folder}/${fileName}${newFileExtension}`;
+            const imageUrl = `assets/${folder}/${newFileName}`;
 
             // Respond with the file URL
             res.status(200).json({ imageUrl });
